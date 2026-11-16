@@ -2136,6 +2136,28 @@ var yorenov = {
   var W = window, D = document, ROOT = D.documentElement;
   if (W.SampCrosshair && W.SampCrosshair.destroy) W.SampCrosshair.destroy();
 
+  /* ============================================================
+     НАСТРОЙКИ
+     IMG  — картинка прицела: data:image/png;base64,... или обычный URL.
+            Пустая строка "" — оставить старый рисованный прицел.
+     SIZE — ЛЮБОЙ размер без ограничений: "12vh", "300px", "250vh"...
+     ============================================================ */
+  var CFG = {
+    IMG: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABN2lDQ1BBZG9iZSBSR0IgKDE5OTgpAAAokZWPv0rDUBSHvxtFxaFWCOLgcCdRUGzVwYxJW4ogWKtDkq1JQ5ViEm6uf/oQjm4dXNx9AidHwUHxCXwDxamDQ4QMBYvf9J3fORzOAaNi152GUYbzWKt205Gu58vZF2aYAoBOmKV2q3UAECdxxBjf7wiA10277jTG+38yH6ZKAyNguxtlIYgK0L/SqQYxBMygn2oQD4CpTto1EE9AqZf7G1AKcv8ASsr1fBBfgNlzPR+MOcAMcl8BTB1da4Bakg7UWe9Uy6plWdLuJkEkjweZjs4zuR+HiUoT1dFRF8jvA2AxH2w3HblWtay99X/+PRHX82Vun0cIQCw9F1lBeKEuf1UYO5PrYsdwGQ7vYXpUZLs3cLcBC7dFtlqF8hY8Dn8AwMZP/fNTP8gAAAAJcEhZcwAACxMAAAsTAQCanBgAAAXRaVRYdFhNTDpjb20uYWRvYmUueG1wAAAAAAA8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/PiA8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJBZG9iZSBYTVAgQ29yZSA1LjYtYzE0NSA3OS4xNjM0OTksIDIwMTgvMDgvMTMtMTY6NDA6MjIgICAgICAgICI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczpwaG90b3Nob3A9Imh0dHA6Ly9ucy5hZG9iZS5jb20vcGhvdG9zaG9wLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE5IChXaW5kb3dzKSIgeG1wOkNyZWF0ZURhdGU9IjIwMjYtMTEtMTZUMTU6NDA6NDcrMDM6MDAiIHhtcDpNb2RpZnlEYXRlPSIyMDI2LTExLTE2VDE1OjQzOjMzKzAzOjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDI2LTExLTE2VDE1OjQzOjMzKzAzOjAwIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpiYmVjY2RhYi03ZDBmLTZjNDItYTVmMC1hZmJjNmRkZWQwZDAiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDplYzljMTYwYi1hNmI5LTQ5NDUtODAwNi03OGMwNTczZmFiZWMiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDoyYTgxNzQ3OS1lNTQwLTY4NDMtOTVhYi03ZWE0YmY1OGRkYWIiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjJhODE3NDc5LWU1NDAtNjg0My05NWFiLTdlYTRiZjU4ZGRhYiIgc3RFdnQ6d2hlbj0iMjAyNi0xMS0xNlQxNTo0MDo0NyswMzowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTkgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpiYmVjY2RhYi03ZDBmLTZjNDItYTVmMC1hZmJjNmRkZWQwZDAiIHN0RXZ0OndoZW49IjIwMjYtMTEtMTZUMTU6NDM6MzMrMDM6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE5IChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8L3JkZjpTZXE+IDwveG1w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",              // <-- сюда вставь свою BASE64-картинку
+    SIZE: "8vh",          // размер (не клампится вообще)
+    OPACITY: 1,           // прозрачность 0..1
+    ROTATE: 0,            // поворот в градусах
+    DOT: false,           // центральная точка поверх картинки
+    DOT_SIZE: ".21vh",
+    COLOR: "#ffffff",     // цвет точки / kill-подкраски
+    KILL_COLOR: "#f64932",
+    OUTLINE: true,        // чёрная обводка вокруг картинки
+    OUTLINE_W: ".09vh",
+    HIT_PULSE: true,      // пульс при попадании
+    SPREAD: false,        // растягивать картинку вместе с разбросом оружия
+    HIDE_ON_SCOPE: true   // прятать прицел в снайперском режиме / при скрытом HUD
+  };
+
   var SID = "sc-style";
   var A = ".hud-aim-crosshair__crosshair[data-v-bef93661]";
   var B = ".hud-aim__container[data-v-7f96fa59]";
@@ -2148,32 +2170,75 @@ var yorenov = {
   var RING = A + "," + B;
   var OUT = "drop-shadow(var(--sc-ow) 0 0 #000) drop-shadow(calc(var(--sc-ow)*-1) 0 0 #000) drop-shadow(0 var(--sc-ow) 0 #000) drop-shadow(0 calc(var(--sc-ow)*-1) 0 #000)";
 
-  var CSS = ""
-    + ":root{--sc-base:3.15vh;--sc-spread:0px;--sc-size:calc(var(--sc-base) + var(--sc-spread));--sc-ring:.04vh;--sc-tick:.68vh;--sc-tw:.295vh;--sc-dot:.21vh;--sc-ow:.09vh;--sc-color:#ffffff;--sc-op:1}"
-    + RING + "{box-sizing:border-box!important;width:var(--sc-size)!important;height:var(--sc-size)!important;min-width:0!important;min-height:0!important;background-color:transparent!important;background-image:none!important;border-style:solid!important;border-width:var(--sc-ring)!important;border-color:var(--sc-color)!important;border-radius:50%!important;opacity:var(--sc-op)!important;overflow:visible!important;filter:" + OUT + "!important}"
-    + A + "{transition:transform .18s ease!important}"
-    + B + "{transition:none!important}"
-    + A + ":before{content:''!important;display:block!important;position:absolute!important;left:50%!important;top:calc(var(--sc-ring)/-2)!important;width:var(--sc-tw)!important;height:var(--sc-tick)!important;background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:0!important;transform:translate(-50%,-50%)!important;box-shadow:0 calc(var(--sc-size) - var(--sc-ring)) 0 var(--sc-color)!important}"
-    + A + ":after{content:''!important;display:block!important;position:absolute!important;top:50%!important;left:calc(var(--sc-ring)/-2)!important;width:var(--sc-tick)!important;height:var(--sc-tw)!important;background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:0!important;transform:translate(-50%,-50%)!important;box-shadow:calc(var(--sc-size) - var(--sc-ring)) 0 0 var(--sc-color)!important}"
-    + WRAP + ":after," + HOST + ":after{content:''!important;display:block!important;position:absolute!important;left:0!important;top:0!important;width:var(--sc-dot)!important;height:var(--sc-dot)!important;margin-left:calc(var(--sc-dot)/-2)!important;margin-top:calc(var(--sc-dot)/-2)!important;background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:50%!important;opacity:var(--sc-op)!important;pointer-events:none!important;filter:" + OUT + "!important}"
-    + HOST + ":after{left:50%!important;top:50%!important}"
-    + SPREAD + "{display:none!important}"
-    + ARROW + "{background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:0!important;opacity:var(--sc-op)!important;filter:none!important}"
-    + ARROW + ":first-child{left:calc(var(--sc-ring)/-2)!important;right:auto!important;top:50%!important;bottom:auto!important;width:var(--sc-tick)!important;height:var(--sc-tw)!important;transform:translateY(-50%)!important}"
-    + ARROW + ":nth-child(3){right:calc(var(--sc-ring)/-2)!important;left:auto!important;top:50%!important;bottom:auto!important;width:var(--sc-tick)!important;height:var(--sc-tw)!important;transform:translateY(-50%)!important}"
-    + ARROW + ":nth-child(2){top:calc(var(--sc-ring)/-2)!important;bottom:auto!important;left:50%!important;right:auto!important;width:var(--sc-tw)!important;height:var(--sc-tick)!important;transform:translateX(-50%)!important}"
-    + ARROW + ":nth-child(4){bottom:calc(var(--sc-ring)/-2)!important;top:auto!important;left:50%!important;right:auto!important;width:var(--sc-tw)!important;height:var(--sc-tick)!important;transform:translateX(-50%)!important}"
-    + "html[data-sc-kill] " + A + ",html[data-sc-kill] " + B + ",html[data-sc-kill] " + WRAP + ":after,html[data-sc-kill] " + HOST + ":after,html[data-sc-kill] " + ARROW + ",.hud-aim-crosshair_kill " + A + ",.hud-aim-crosshair_kill " + WRAP + ":after,.hud-aim-crosshair_kill " + ARROW + "{--sc-color:#f64932!important}"
-    + "html[data-sc-hit] " + A + ",html[data-sc-kill] " + A + ",.hud-aim-crosshair_hit " + A + ",.hud-aim-crosshair_kill " + A + "{animation:sc-pa .24s ease-out!important}"
-    + "html[data-sc-hit] " + B + ",html[data-sc-kill] " + B + "{animation:sc-pb .24s ease-out!important}"
-    + "html[data-sc-off] " + RING + ",html[data-sc-hide] " + RING + ",html[data-sc-off] " + WRAP + ":after,html[data-sc-hide] " + WRAP + ":after,html[data-sc-off] " + HOST + ":after,html[data-sc-hide] " + HOST + ":after,html[data-sc-off] " + ARROW + ",html[data-sc-hide] " + ARROW + "{opacity:0!important}"
-    + "@keyframes sc-pa{0%{transform:translate(-50%,-50%) scale(1)}45%{transform:translate(-50%,-50%) scale(1.3)}100%{transform:translate(-50%,-50%) scale(1)}}"
-    + "@keyframes sc-pb{0%{transform:scale(1)}45%{transform:scale(1.3)}100%{transform:scale(1)}}";
+  function buildCSS() {
+    var imgMode = !!CFG.IMG;
+    var css = ""
+      + ":root{--sc-base:" + CFG.SIZE + ";--sc-spread:0px;"
+      + "--sc-size:calc(var(--sc-base) + var(--sc-spread));"
+      + "--sc-ring:.04vh;--sc-tick:.68vh;--sc-tw:.295vh;"
+      + "--sc-dot:" + CFG.DOT_SIZE + ";--sc-ow:" + (CFG.OUTLINE ? CFG.OUTLINE_W : "0px") + ";"
+      + "--sc-color:" + CFG.COLOR + ";--sc-op:" + CFG.OPACITY + ";"
+      + "--sc-img:url(\"" + CFG.IMG + "\");--sc-rot:" + CFG.ROTATE + "deg}";
+
+    if (imgMode) {
+      /* Режим картинки: родной прицел гасим, картинку рисуем псевдоэлементом хоста */
+      css += RING + "{background:none!important;border:0!important;box-shadow:none!important;filter:none!important}"
+        + A + ":before," + A + ":after," + WRAP + ":after{content:none!important;display:none!important}"
+        + SPREAD + "," + ARROW + "{display:none!important}"
+        + HOST + ":after{content:''!important;display:block!important;position:absolute!important;"
+        + "left:50%!important;top:50%!important;width:var(--sc-size)!important;height:var(--sc-size)!important;"
+        + "min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;"
+        + "transform:translate(-50%,-50%) rotate(var(--sc-rot))!important;"
+        + "background-image:var(--sc-img)!important;background-color:transparent!important;"
+        + "background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important;"
+        + "border:0!important;border-radius:0!important;opacity:var(--sc-op)!important;pointer-events:none!important;"
+        + "z-index:9999!important;overflow:visible!important;filter:" + OUT + "!important}";
+      if (CFG.DOT) {
+        css += HOST + ":before{content:''!important;display:block!important;position:absolute!important;"
+          + "left:50%!important;top:50%!important;width:var(--sc-dot)!important;height:var(--sc-dot)!important;"
+          + "margin-left:calc(var(--sc-dot)/-2)!important;margin-top:calc(var(--sc-dot)/-2)!important;"
+          + "background-color:var(--sc-color)!important;background-image:none!important;border:0!important;"
+          + "border-radius:50%!important;opacity:var(--sc-op)!important;pointer-events:none!important;"
+          + "z-index:10000!important;filter:" + OUT + "!important}";
+      }
+      css += "html[data-sc-off] " + HOST + ":after,html[data-sc-hide] " + HOST + ":after,"
+        + "html[data-sc-off] " + HOST + ":before,html[data-sc-hide] " + HOST + ":before{opacity:0!important}";
+      if (CFG.HIT_PULSE) {
+        css += "html[data-sc-hit] " + HOST + ":after{animation:sc-pi .24s ease-out!important}"
+          + "html[data-sc-kill] " + HOST + ":after{animation:sc-pk .4s ease-out!important}";
+      }
+      css += "html[data-sc-kill] " + HOST + ":after,html[data-sc-kill] " + HOST + ":before{--sc-color:" + CFG.KILL_COLOR + "!important}";
+    } else {
+      /* Старый рисованный режим (кольцо + штрихи), размер тоже без ограничений */
+      css += RING + "{box-sizing:border-box!important;width:var(--sc-size)!important;height:var(--sc-size)!important;min-width:0!important;min-height:0!important;background-color:transparent!important;background-image:none!important;border-style:solid!important;border-width:var(--sc-ring)!important;border-color:var(--sc-color)!important;border-radius:50%!important;opacity:var(--sc-op)!important;overflow:visible!important;filter:" + OUT + "!important}"
+        + A + "{transition:transform .18s ease!important}"
+        + B + "{transition:none!important}"
+        + A + ":before{content:''!important;display:block!important;position:absolute!important;left:50%!important;top:calc(var(--sc-ring)/-2)!important;width:var(--sc-tw)!important;height:var(--sc-tick)!important;background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:0!important;transform:translate(-50%,-50%)!important;box-shadow:0 calc(var(--sc-size) - var(--sc-ring)) 0 var(--sc-color)!important}"
+        + A + ":after{content:''!important;display:block!important;position:absolute!important;top:50%!important;left:calc(var(--sc-ring)/-2)!important;width:var(--sc-tick)!important;height:var(--sc-tw)!important;background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:0!important;transform:translate(-50%,-50%)!important;box-shadow:calc(var(--sc-size) - var(--sc-ring)) 0 0 var(--sc-color)!important}"
+        + WRAP + ":after," + HOST + ":after{content:''!important;display:block!important;position:absolute!important;left:0!important;top:0!important;width:var(--sc-dot)!important;height:var(--sc-dot)!important;margin-left:calc(var(--sc-dot)/-2)!important;margin-top:calc(var(--sc-dot)/-2)!important;background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:50%!important;opacity:var(--sc-op)!important;pointer-events:none!important;filter:" + OUT + "!important}"
+        + HOST + ":after{left:50%!important;top:50%!important}"
+        + SPREAD + "{display:none!important}"
+        + ARROW + "{background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:0!important;opacity:var(--sc-op)!important;filter:none!important}"
+        + ARROW + ":first-child{left:calc(var(--sc-ring)/-2)!important;right:auto!important;top:50%!important;bottom:auto!important;width:var(--sc-tick)!important;height:var(--sc-tw)!important;transform:translateY(-50%)!important}"
+        + ARROW + ":nth-child(3){right:calc(var(--sc-ring)/-2)!important;left:auto!important;top:50%!important;bottom:auto!important;width:var(--sc-tick)!important;height:var(--sc-tw)!important;transform:translateY(-50%)!important}"
+        + ARROW + ":nth-child(2){top:calc(var(--sc-ring)/-2)!important;bottom:auto!important;left:50%!important;right:auto!important;width:var(--sc-tw)!important;height:var(--sc-tick)!important;transform:translateX(-50%)!important}"
+        + ARROW + ":nth-child(4){bottom:calc(var(--sc-ring)/-2)!important;top:auto!important;left:50%!important;right:auto!important;width:var(--sc-tw)!important;height:var(--sc-tick)!important;transform:translateX(-50%)!important}"
+        + "html[data-sc-kill] " + A + ",html[data-sc-kill] " + B + ",html[data-sc-kill] " + WRAP + ":after,html[data-sc-kill] " + HOST + ":after,html[data-sc-kill] " + ARROW + ",.hud-aim-crosshair_kill " + A + ",.hud-aim-crosshair_kill " + WRAP + ":after,.hud-aim-crosshair_kill " + ARROW + "{--sc-color:#f64932!important}"
+        + "html[data-sc-hit] " + A + ",html[data-sc-kill] " + A + ",.hud-aim-crosshair_hit " + A + ",.hud-aim-crosshair_kill " + A + "{animation:sc-pa .24s ease-out!important}"
+        + "html[data-sc-hit] " + B + ",html[data-sc-kill] " + B + "{animation:sc-pb .24s ease-out!important}"
+        + "html[data-sc-off] " + RING + ",html[data-sc-hide] " + RING + ",html[data-sc-off] " + WRAP + ":after,html[data-sc-hide] " + WRAP + ":after,html[data-sc-off] " + HOST + ":after,html[data-sc-hide] " + HOST + ":after,html[data-sc-off] " + ARROW + ",html[data-sc-hide] " + ARROW + "{opacity:0!important}";
+    }
+
+    css += "@keyframes sc-pa{0%{transform:translate(-50%,-50%) scale(1)}45%{transform:translate(-50%,-50%) scale(1.3)}100%{transform:translate(-50%,-50%) scale(1)}}"
+      + "@keyframes sc-pb{0%{transform:scale(1)}45%{transform:scale(1.3)}100%{transform:scale(1)}}"
+      + "@keyframes sc-pi{0%{transform:translate(-50%,-50%) rotate(var(--sc-rot)) scale(1)}45%{transform:translate(-50%,-50%) rotate(var(--sc-rot)) scale(1.25)}100%{transform:translate(-50%,-50%) rotate(var(--sc-rot)) scale(1)}}"
+      + "@keyframes sc-pk{0%{transform:translate(-50%,-50%) rotate(var(--sc-rot)) scale(1);filter:" + OUT + " brightness(1)}30%{transform:translate(-50%,-50%) rotate(var(--sc-rot)) scale(1.4);filter:" + OUT + " sepia(1) saturate(9) hue-rotate(-25deg) brightness(1.15)}100%{transform:translate(-50%,-50%) rotate(var(--sc-rot)) scale(1);filter:" + OUT + " brightness(1)}}";
+    return css;
+  }
 
   var st = { off: false, hide: false, spread: 0, t1: 0, t2: 0, raf: 0, obs: null, poll: 0, hooked: null, last: 0, dead: false };
 
   function q(s) { try { return D.querySelector(s); } catch (e) { return null; } }
-  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function vh(v) { return v * W.innerHeight / 100; }
   function flag(n, on) { if (on) ROOT.setAttribute(n, ""); else ROOT.removeAttribute(n); }
 
@@ -2199,6 +2264,7 @@ var yorenov = {
   }
 
   function readSpread() {
+    if (!CFG.SPREAD) return;
     var extra = 0, el = q(SPREAD);
     if (el && el.style.width) {
       var raw = el.style.width, n = parseFloat(raw);
@@ -2213,12 +2279,12 @@ var yorenov = {
         if (!isNaN(w) && w > 0) extra = Math.max(0, w / 48 - 1) * vh(2.2);
       }
     }
-    extra = clamp(extra, 0, vh(7));
+    /* верхнего предела разброса больше нет */
     if (Math.abs(extra - st.spread) > 0.4) { st.spread = extra; ROOT.style.setProperty("--sc-spread", extra.toFixed(2) + "px"); }
   }
 
   function sync() {
-    var off = !!q(SCOPE) || !!q(HIDDEN);
+    var off = CFG.HIDE_ON_SCOPE && (!!q(SCOPE) || !!q(HIDDEN));
     if (off !== st.off) { st.off = off; flag("data-sc-off", off); }
     var box = q(B), host = box ? box.parentElement : null;
     var marked = D.querySelectorAll(".hud-aim.sc-host");
@@ -2233,12 +2299,34 @@ var yorenov = {
     st.raf = W.requestAnimationFrame(tick);
   }
 
+  function applyStyle() {
+    var s = D.getElementById(SID);
+    if (!s) { s = D.createElement("style"); s.id = SID; (D.head || ROOT).appendChild(s); }
+    s.textContent = buildCSS();
+  }
+
   var api = {
-    version: "4.0.0",
+    version: "5.0.0",
     hit: function () { flash("hit"); return api; },
     kill: function () { flash("kill"); return api; },
     show: function () { st.hide = false; flag("data-sc-hide", false); return api; },
     hide: function () { st.hide = true; flag("data-sc-hide", true); return api; },
+
+    /* --- новое API для картинки --- */
+    setImage: function (src) {           // base64 data-URI или URL; "" вернёт рисованный прицел
+      CFG.IMG = src || "";
+      applyStyle(); return api;
+    },
+    setSize: function (size) {           // "15vh", "500px", "300vh" — без лимитов
+      CFG.SIZE = size;
+      ROOT.style.setProperty("--sc-base", size); return api;
+    },
+    setOpacity: function (o) { CFG.OPACITY = o; ROOT.style.setProperty("--sc-op", o); return api; },
+    setRotate: function (deg) { CFG.ROTATE = deg; ROOT.style.setProperty("--sc-rot", deg + "deg"); return api; },
+    setColor: function (c) { CFG.COLOR = c; ROOT.style.setProperty("--sc-color", c); return api; },
+    setOutline: function (w) { ROOT.style.setProperty("--sc-ow", w); return api; }, // "0px" — выключить
+    config: CFG,
+
     destroy: function () {
       st.dead = true;
       W.cancelAnimationFrame(st.raf); clearInterval(st.poll); clearTimeout(st.t1); clearTimeout(st.t2);
@@ -2248,15 +2336,12 @@ var yorenov = {
       var m = D.querySelectorAll(".hud-aim.sc-host");
       for (var i = 0; i < m.length; i++) m[i].classList.remove("sc-host");
       ["data-sc-off", "data-sc-hide", "data-sc-hit", "data-sc-kill"].forEach(function (a) { ROOT.removeAttribute(a); });
-      ROOT.style.removeProperty("--sc-spread");
+      ["--sc-spread", "--sc-base", "--sc-op", "--sc-rot", "--sc-color", "--sc-ow"].forEach(function (p) { ROOT.style.removeProperty(p); });
       try { delete W.SampCrosshair; } catch (e) { W.SampCrosshair = undefined; }
     }
   };
 
-  var old = D.getElementById(SID); if (old) old.remove();
-  var style = D.createElement("style");
-  style.id = SID; style.textContent = CSS;
-  (D.head || ROOT).appendChild(style);
+  applyStyle();
   sync();
 
   st.obs = new MutationObserver(function () { sync(); });
