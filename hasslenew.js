@@ -819,7 +819,7 @@ var yorenov = {
         },
         setStyles: function setStyles() {
             var e = "";
-            e += ".OLD-RADMIR { width: 100vw; height: 100vh; position: relative; }.OLD-RADMIR-logo { position: absolute; display: block!important; right: 4vh; top: 1.66vh; transform-origin: top right; width: 24vh!important; height: 4vh!important; }.OLD-RADMIR-logo img { width: 24vh!important; height: 4vh!important; object-fit: contain!important; display:block!important; } .OLD-RADMIR-logo__bonus { background: radial-gradient(93.1% 93.1% at 126.72% 6.9%, #eb00ff 0, #eb00ff00 100%), linear-gradient(129.39deg, #f5be09 30.88%, #e9651b 98.06%); width: 2.72vh; height: 2.72vh; display: flex; align-items: center; justify-content: center; font-size: 1.57vh; color: #fff; font-weight: 700; position: absolute; bottom: -0.46vh; right: -0.19vh; border-radius: 50%; font-style: italic; font-weight: 900; } .OLD-RADMIR-hud { position: relative; top: 2vh; right: 0vh; } .OLD-RADMIR-weapon__back { position: absolute; right: 4.17vh; top: 9.81vh; width: 37vh!important; height: 16.6vh!important; object-fit: contain!important; } .OLD-RADMIR-weapon__icon { position: absolute; right: 5.74vh; top: 11.2vh; width: 37vh!important; height: 16.6vh!important; object-fit: contain!important; } .OLD-RADMIR-weapon__ammo { position: absolute; right: 8.33vh; top: 20.37vh; color: #fff; width: 7.41vh; text-align: center; } .OLD-RADMIR-weapon__ammo #OLD-RADMIR-ammo__in-clip { font-family: 'GothamPro Black Italic'; font-weight: 900; font-style: italic; font-size: 2.31vh; margin-right: 2.96vh; text-shadow: 0 0 0.46vh #00000080; } .OLD-RADMIR-weapon__ammo #OLD-RADMIR-ammo__total { font-family: 'GothamPro Light Italic'; font-weight: 300; font-style: italic; font-size: 1.67vh; text-shadow: 0 0 0.46vh #000000b3; margin-top: -2.13vh; margin-left: 2.22vh; } .OLD-RADMIR-hud .OLD-RADMIR-hud__cash { position: absolute; right: 22.22vh; top: 12.96vh; display: inline-flex; align-items: center; } .OLD-RADMIR-cash__icon { margin-right: 1.2vh; margin-top: 0.09vh; width: 2.4vh; height: 2.4vh; } .OLD-RADMIR-hud__cash #OLD-RADMIR-cash__value { font-family: 'GothamPro Black Italic'; font-weight: 900; font-style: italic; color: #fff; display: inline-block; font-size: 2.59vh; text-shadow: 0 0 0.46vh #00000080; margin-top: -2.78vh; margin-left: 3.43vh; } .OLD-RADMIR-hud .OLD-RADMIR-hud__params { width: 15.74vh; position: absolute; top: 16.67vh; right: 23.61vh; } .OLD-RADMIR-param__armour, .OLD-RADMIR-param__breath, .OLD-RADMIR-param__hunger { margin-top: 0.93vh; } .OLD-RADMIR-param { display: inline-flex; align-items: center; } .OLD-RADMIR-param__icon { margin-right: 1.11vh; width: 1.56vh; height: 1.56vh; object-fit: contain; } .OLD-RADMIR-param__progress, .OLD-RADMIR-progress__value { width: 9.26vh; height: .46vh; background-color: #0000004d; border-radius: .46vh; } .OLD-RADMIR-progress__value { border-radius: .46vh; } .OLD-RADMIR-param__circle { position: absolute; right: -.43vh; top: 50%; transform: translateY(-50%); width: .85vh; height: .93vh; margin: 0; object-fit: contain; } .OLD-RADMIR-progress__value { position: relative; } .OLD-RADMIR-param__amount { font-family: 'GothamPro Light Italic'; font-weight: 300; font-style: italic; margin-left: 0.93vh; width: 3.24vh; text-align: left; color: #fff; font-size: 1.67vh; text-shadow: 0 0 0.46vh #000000b3; } .OLD-RADMIR-param__health .OLD-RADMIR-param__progress { margin-top: -0.93vh; margin-left: 2.55vh; } .OLD-RADMIR-param__health { margin-left: 2.22vh; margin-top: 0.25vh; } .OLD-RADMIR-param__health .OLD-RADMIR-progress__value { width: 50%; background-color: #ffffff; } .OLD-RADMIR-param__health .OLD-RADMIR-param__amount { margin-left: 12.78vh; margin-top: -1.15vh; } .OLD-RADMIR-param__armour .OLD-RADMIR-param__progress { margin-top: -0.93vh; margin-left: 2.55vh; } .OLD-RADMIR-param__armour { margin-left: 1.39vh; margin-top: 0.51vh; } .OLD-RADMIR-param__armour .OLD-RADMIR-param__icon { margin-right: 1.3vh; margin-top: 0.69vh; width: 1.56vh; height: 1.56vh; object-fit: contain; } .OLD-RADMIR-param__armour .OLD-RADMIR-progress__value { width: 50%; background-color: #ffffff; } .OLD-RADMIR-param__armour .OLD-RADMIR-param__amount { margin-left: 12.78vh; margin-top: -1.15vh; } .OLD-RADMIR-param__hunger .OLD-RADMIR-param__progress { margin-top: -1.06vh; margin-left: 2.55vh; } .OLD-RADMIR-param__hunger { margin-left: 0.46vh; margin-top: 0.51vh; } .OLD-RADMIR-param__hunger .OLD-RADMIR-progress__value { width: 50%; background-color: #ffffff; } .OLD-RADMIR-param__hunger .OLD-RADMIR-param__amount { margin-left: 12.78vh; margin-top: -1.21vh; } .OLD-RADMIR-param__breath .OLD-RADMIR-param__progress { margin-top: -1.94vh; margin-left: 3.89vh; } .OLD-RADMIR-param__breath { margin-left: -2.13vh; margin-top: 2.04vh; } .OLD-RADMIR-param__breath .OLD-RADMIR-progress__value { width: 99%; background-color: #fff; box-shadow: rgb(255 255 255 / .5) 0 0 0.46vh 0; } .OLD-RADMIR-param__breath .OLD-RADMIR-param__amount { margin-left: 14.17vh; margin-top: -1.21vh; } .OLD-RADMIR-hud__wanted { position: absolute; right: 6.48vh; top: 23.15vh; } .OLD-RADMIR-wanted__back { position: absolute; right: 0; top: 2.31vh; } .OLD-RADMIR-wanted__row { display: flex; flex-direction: row; position: absolute; right: 1.39vh; top: 2.96vh; } .OLD-RADMIR-wanted__row>img { height: 1.9vh; width: 2.31vh; padding: 0.19vh 0.28vh 0.19vh 0.28vh; } .OLD-RADMIR-hud__wanted--always-show .OLD-RADMIR-wanted__inactive { opacity: .3; } .OLD-RADMIR-green-zone__main { position: fixed; right: 147vh!important; top: 70vh!important; display: flex; align-items: center; } .OLD-RADMIR-green-zone__image { margin-right: .96vh; width: 4vh!important; height: 4vh!important; object-fit: contain!important; } .OLD-RADMIR-green-zone__text { color: #fff; text-shadow: 0.28vh 0.28vh 0.46vh #00000080; } .OLD-RADMIR-green-zone__text div:first-child { font-size: 1.2vh; font-weight: 900; text-transform: uppercase; } .OLD-RADMIR-green-zone__text div:last-child { color: hsl(0deg 0% 100% / 70%); font-size: 1.11vh; font-weight: 500; margin-top: 0.46vh; } .OLD-RADMIR-param__freeze { transform: translateY(100%); position: absolute; top: 96vh; left: 8.8vh; background: rgb(114 205 223 / .45); width: 22vh; height: .95vh; border-radius: 1vh; border: rgb(0 0 0 / .2) .2vh solid; overflow: hidden; } .OLD-RADMIR-freeze__value { height: 100%; width: 0%; border-radius: .3vh; background: #72cddf; } #app .hud-radmir-radar__radar-border { display: none; } #app .hud-radmir-radar__radar-border_new-year { display: none; } #app .hud-radmir-radar__radar-border_helloween { display: none; } #app .hud-radmir-radar__radar-bats { display: none; } #app .vignette { display: none; } #app .hud-hassle-map>img, #app .hud-radmir-radar__radar>img, #app .hud-radmir-wanted, #app .overlay-container, #app .scrollable-container_type_1 .scrollable-container__rail_y, #app .vignette, #app .window .modal__pattern-wrapper { display: none; } #app .hud-radmir-speedometer-secondary { background-image: url(); } #app .voice-chat, #app .voice-chat_controls { display: flex !important; } #app .modal-container-wrapper { border: 0; box-shadow: none; transform: scale(0.8); border-radius: 1.34vh; } #app .login-form__button_active { border-radius: .6vh; } #app .login-form__button { border-radius: .6vh; } #app .immortality-progress-bar .immortality-progress-bar_background, #app .immortality-progress-bar .circle-progress__svg { display: none!important; } #app .immortality-progress-bar .immortality-progress-bar__icon { left: -7vh!important; bottom: -2.2vh!important; }";
+            e += ".OLD-RADMIR { width: 100vw; height: 100vh; position: relative; }.OLD-RADMIR-logo { position: absolute; display: block!important; right: 4vh; top: 1.66vh; transform-origin: top right; width: 24vh!important; height: 4vh!important; }.OLD-RADMIR-logo img { width: 24vh!important; height: 4vh!important; object-fit: contain!important; display:block!important; } .OLD-RADMIR-logo__bonus { background: radial-gradient(93.1% 93.1% at 126.72% 6.9%, #eb00ff 0, #eb00ff00 100%), linear-gradient(129.39deg, #f5be09 30.88%, #e9651b 98.06%); width: 2.52vh; height: 2.52vh; display: flex; align-items: center; justify-content: center; font-size: 1.57vh; color: #fff; font-weight: 700; position: absolute; bottom: -0.46vh; right: -0.19vh; border-radius: 50%; font-style: italic; font-weight: 900; } .OLD-RADMIR-hud { position: relative; top: 2vh; right: 0vh; } .OLD-RADMIR-weapon__back { position: absolute; right: 4.17vh; top: 9.81vh; width: 37vh!important; height: 16.6vh!important; object-fit: contain!important; } .OLD-RADMIR-weapon__icon { position: absolute; right: 5.74vh; top: 11.2vh; width: 37vh!important; height: 16.6vh!important; object-fit: contain!important; } .OLD-RADMIR-weapon__ammo { position: absolute; right: 8.33vh; top: 20.37vh; color: #fff; width: 7.41vh; text-align: center; } .OLD-RADMIR-weapon__ammo #OLD-RADMIR-ammo__in-clip { font-family: 'GothamPro Black Italic'; font-weight: 900; font-style: italic; font-size: 2.31vh; margin-right: 2.96vh; text-shadow: 0 0 0.46vh #00000080; } .OLD-RADMIR-weapon__ammo #OLD-RADMIR-ammo__total { font-family: 'GothamPro Light Italic'; font-weight: 300; font-style: italic; font-size: 1.67vh; text-shadow: 0 0 0.46vh #000000b3; margin-top: -2.13vh; margin-left: 2.22vh; } .OLD-RADMIR-hud .OLD-RADMIR-hud__cash { position: absolute; right: 22.22vh; top: 12.96vh; display: inline-flex; align-items: center; } .OLD-RADMIR-cash__icon { margin-right: 1.2vh; margin-top: 0.09vh; width: 2.4vh; height: 2.4vh; } .OLD-RADMIR-hud__cash #OLD-RADMIR-cash__value { font-family: 'GothamPro Black Italic'; font-weight: 900; font-style: italic; color: #fff; display: inline-block; font-size: 2.59vh; text-shadow: 0 0 0.46vh #00000080; margin-top: -2.78vh; margin-left: 3.43vh; } .OLD-RADMIR-hud .OLD-RADMIR-hud__params { width: 15.74vh; position: absolute; top: 16.67vh; right: 23.61vh; } .OLD-RADMIR-param__armour, .OLD-RADMIR-param__breath, .OLD-RADMIR-param__hunger { margin-top: 0.93vh; } .OLD-RADMIR-param { display: inline-flex; align-items: center; } .OLD-RADMIR-param__icon { margin-right: 1.11vh; width: 1.56vh; height: 1.56vh; object-fit: contain; } .OLD-RADMIR-param__progress, .OLD-RADMIR-progress__value { width: 9.26vh; height: .46vh; background-color: #0000004d; border-radius: .46vh; } .OLD-RADMIR-progress__value { border-radius: .46vh; } .OLD-RADMIR-param__circle { position: absolute; right: -.43vh; top: 50%; transform: translateY(-50%); width: .85vh; height: .93vh; margin: 0; object-fit: contain; } .OLD-RADMIR-progress__value { position: relative; } .OLD-RADMIR-param__amount { font-family: 'GothamPro Light Italic'; font-weight: 300; font-style: italic; margin-left: 0.93vh; width: 3.24vh; text-align: left; color: #fff; font-size: 1.67vh; text-shadow: 0 0 0.46vh #000000b3; } .OLD-RADMIR-param__health .OLD-RADMIR-param__progress { margin-top: -0.93vh; margin-left: 2.55vh; } .OLD-RADMIR-param__health { margin-left: 2.22vh; margin-top: 0.25vh; } .OLD-RADMIR-param__health .OLD-RADMIR-progress__value { width: 50%; background-color: #ed2e2e; } .OLD-RADMIR-param__health .OLD-RADMIR-param__amount { margin-left: 12.78vh; margin-top: -1.15vh; } .OLD-RADMIR-param__armour .OLD-RADMIR-param__progress { margin-top: -0.93vh; margin-left: 2.55vh; } .OLD-RADMIR-param__armour { margin-left: 1.39vh; margin-top: 0.51vh; } .OLD-RADMIR-param__armour .OLD-RADMIR-param__icon { margin-right: 1.3vh; margin-top: 0.69vh; width: 1.56vh; height: 1.56vh; object-fit: contain; } .OLD-RADMIR-param__armour .OLD-RADMIR-progress__value { width: 50%; background-color: #526ee6; } .OLD-RADMIR-param__armour .OLD-RADMIR-param__amount { margin-left: 12.78vh; margin-top: -1.15vh; } .OLD-RADMIR-param__hunger .OLD-RADMIR-param__progress { margin-top: -1.06vh; margin-left: 2.55vh; } .OLD-RADMIR-param__hunger { margin-left: 0.46vh; margin-top: 0.51vh; } .OLD-RADMIR-param__hunger .OLD-RADMIR-progress__value { width: 50%; background-color: #ff872e; } .OLD-RADMIR-param__hunger .OLD-RADMIR-param__amount { margin-left: 12.78vh; margin-top: -1.21vh; } .OLD-RADMIR-param__breath .OLD-RADMIR-param__progress { margin-top: -1.94vh; margin-left: 3.89vh; } .OLD-RADMIR-param__breath { margin-left: -2.13vh; margin-top: 2.04vh; } .OLD-RADMIR-param__breath .OLD-RADMIR-progress__value { width: 99%; background-color: #fff; box-shadow: rgb(255 255 255 / .5) 0 0 0.46vh 0; } .OLD-RADMIR-param__breath .OLD-RADMIR-param__amount { margin-left: 14.17vh; margin-top: -1.21vh; } .OLD-RADMIR-hud__wanted { position: absolute; right: 6.48vh; top: 23.15vh; } .OLD-RADMIR-wanted__back { position: absolute; right: 0; top: 2.31vh; } .OLD-RADMIR-wanted__row { display: flex; flex-direction: row; position: absolute; right: 1.39vh; top: 2.96vh; } .OLD-RADMIR-wanted__row>img { height: 1.9vh; width: 2.31vh; padding: 0.19vh 0.28vh 0.19vh 0.28vh; } .OLD-RADMIR-hud__wanted--always-show .OLD-RADMIR-wanted__inactive { opacity: .3; } .OLD-RADMIR-green-zone__main { position: fixed; right: 147vh!important; top: 70vh!important; display: flex; align-items: center; } .OLD-RADMIR-green-zone__image { margin-right: .96vh; width: 4vh!important; height: 4vh!important; object-fit: contain!important; } .OLD-RADMIR-green-zone__text { color: #fff; text-shadow: 0.28vh 0.28vh 0.46vh #00000080; } .OLD-RADMIR-green-zone__text div:first-child { font-size: 1.2vh; font-weight: 900; text-transform: uppercase; } .OLD-RADMIR-green-zone__text div:last-child { color: hsl(0deg 0% 100% / 70%); font-size: 1.11vh; font-weight: 500; margin-top: 0.46vh; } .OLD-RADMIR-param__freeze { transform: translateY(100%); position: absolute; top: 96vh; left: 8.8vh; background: rgb(114 205 223 / .45); width: 22vh; height: .95vh; border-radius: 1vh; border: rgb(0 0 0 / .2) .2vh solid; overflow: hidden; } .OLD-RADMIR-freeze__value { height: 100%; width: 0%; border-radius: .3vh; background: #72cddf; } #app .hud-radmir-radar__radar-border { display: none; } #app .hud-radmir-radar__radar-border_new-year { display: none; } #app .hud-radmir-radar__radar-border_helloween { display: none; } #app .hud-radmir-radar__radar-bats { display: none; } #app .vignette { display: none; } #app .hud-hassle-map>img, #app .hud-radmir-radar__radar>img, #app .hud-radmir-wanted, #app .overlay-container, #app .scrollable-container_type_1 .scrollable-container__rail_y, #app .vignette, #app .window .modal__pattern-wrapper { display: none; } #app .hud-radmir-speedometer-secondary { background-image: url(); } #app .voice-chat, #app .voice-chat_controls { display: flex !important; } #app .modal-container-wrapper { border: 0; box-shadow: none; transform: scale(0.8); border-radius: 1.34vh; } #app .login-form__button_active { border-radius: .6vh; } #app .login-form__button { border-radius: .6vh; } #app .immortality-progress-bar .immortality-progress-bar_background, #app .immortality-progress-bar .circle-progress__svg { display: none!important; } #app .immortality-progress-bar .immortality-progress-bar__icon { left: -7vh!important; bottom: -2.2vh!important; }";
             e += "@font-face{font-family:'GothamPro Light';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/main/gothampro_light.ttf') format('truetype');font-weight:300;font-style:normal}";
             e += "@font-face{font-family:'GothamPro Light Italic';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/main/gothampro_lightitalic.ttf') format('truetype');font-weight:300;font-style:italic}";
             e += "@font-face{font-family:'GothamPro Regular';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/main/gothampro.ttf') format('truetype');font-weight:400;font-style:normal}";
@@ -2136,85 +2136,46 @@ var yorenov = {
   var W = window, D = document, ROOT = D.documentElement;
   if (W.SampCrosshair && W.SampCrosshair.destroy) W.SampCrosshair.destroy();
 
-  /* ================= НАСТРОЙКИ ================= */
-  var CFG = {
-    IMG: "",              // data:image/png;base64,... или URL. Пусто = тестовый прицел
-    SIZE: "8vh",          // любой размер: "300px", "25vh", "200vh" — без лимитов
-    OPACITY: 1,
-    ROTATE: 0,            // градусы
-    OUTLINE: true,        // чёрная обводка
-    OUTLINE_W: ".09vh",
-    HIT_PULSE: true,
-    KILL_TINT: true,      // красная вспышка при килле
-    SPREAD: false,        // растягивать при разбросе
-    HIDE_ON_SCOPE: true,  // прятать в снайперском прицеле
-    HIDE_NATIVE: true     // скрывать родной прицел игры
-  };
-  /* ============================================= */
-
-  var SID = "sc-style", IID = "sc-crosshair-img";
+  var SID = "sc-style";
   var A = ".hud-aim-crosshair__crosshair[data-v-bef93661]";
   var B = ".hud-aim__container[data-v-7f96fa59]";
   var WRAP = ".hud-aim-crosshair__crosshair-wrapper[data-v-bef93661]";
   var SPREAD = ".hud-aim-crosshair__spread-container[data-v-bef93661]";
+  var SCOPE = ".sniper-aim[data-v-f6508f7b],.hud-aim__sniper[data-v-7f96fa59]";
+  var HIDDEN = ".hud-iface-hidden[data-v-7f96fa59]";
   var ARROW = ".hud-aim__arrow[data-v-7f96fa59]";
-  var SCOPE = ".sniper-aim[data-v-f6508f7b],.hud-aim__sniper[data-v-7f96fa59],.sniper-aim,.hud-aim__sniper";
-  var HIDDEN = ".hud-iface-hidden[data-v-7f96fa59],.hud-iface-hidden";
+  var HOST = ".hud-aim.sc-host[data-v-7f96fa59]";
+  var RING = A + "," + B;
   var OUT = "drop-shadow(var(--sc-ow) 0 0 #000) drop-shadow(calc(var(--sc-ow)*-1) 0 0 #000) drop-shadow(0 var(--sc-ow) 0 #000) drop-shadow(0 calc(var(--sc-ow)*-1) 0 #000)";
 
-  /* запасная картинка (SVG), чтобы сразу видеть, что оверлей работает */
-  var TEST_IMG = "data:image/svg+xml," + encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
-    '<g stroke="#fff" stroke-width="4" fill="none">' +
-    '<circle cx="50" cy="50" r="30"/>' +
-    '<path d="M50 8v18M50 74v18M8 50h18M74 50h18"/></g>' +
-    '<circle cx="50" cy="50" r="4" fill="#fff"/></svg>');
-
   var CSS = ""
-    + ":root{--sc-base:" + CFG.SIZE + ";--sc-spread:0px;--sc-size:calc(var(--sc-base) + var(--sc-spread));"
-    + "--sc-op:" + CFG.OPACITY + ";--sc-rot:" + CFG.ROTATE + "deg;--sc-ow:" + (CFG.OUTLINE ? CFG.OUTLINE_W : "0px") + ";--sc-color:#fff}"
-    + "#sc-crosshair-img{position:fixed!important;left:50%!important;top:50%!important;"
-    + "width:var(--sc-size)!important;height:var(--sc-size)!important;"
-    + "min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;"
-    + "transform:translate(-50%,-50%) rotate(var(--sc-rot))!important;"
-    + "opacity:var(--sc-op)!important;pointer-events:none!important;z-index:2147483647!important;"
-    + "display:block!important;visibility:visible!important;margin:0!important;padding:0!important;"
-    + "border:0!important;background:none!important;filter:" + OUT + "!important;object-fit:contain!important}"
-    + "html[data-sc-off] #sc-crosshair-img,html[data-sc-hide] #sc-crosshair-img{opacity:0!important}"
-    + "html[data-sc-hit] #sc-crosshair-img{animation:sc-pi .24s ease-out!important}"
-    + "html[data-sc-kill] #sc-crosshair-img{animation:sc-pk .4s ease-out!important}"
-    + "@keyframes sc-pi{0%{transform:translate(-50%,-50%) rotate(var(--sc-rot)) scale(1)}45%{transform:translate(-50%,-50%) rotate(var(--sc-rot)) scale(1.25)}100%{transform:translate(-50%,-50%) rotate(var(--sc-rot)) scale(1)}}"
-    + "@keyframes sc-pk{0%{transform:translate(-50%,-50%) rotate(var(--sc-rot)) scale(1);filter:" + OUT + " brightness(1)}30%{transform:translate(-50%,-50%) rotate(var(--sc-rot)) scale(1.4);filter:" + OUT + " sepia(1) saturate(9) hue-rotate(-25deg) brightness(1.15)}100%{transform:translate(-50%,-50%) rotate(var(--sc-rot)) scale(1);filter:" + OUT + " brightness(1)}}";
+    + ":root{--sc-base:3.15vh;--sc-spread:0px;--sc-size:calc(var(--sc-base) + var(--sc-spread));--sc-ring:.04vh;--sc-tick:.68vh;--sc-tw:.295vh;--sc-dot:.21vh;--sc-ow:.09vh;--sc-color:#ffffff;--sc-op:1}"
+    + RING + "{box-sizing:border-box!important;width:var(--sc-size)!important;height:var(--sc-size)!important;min-width:0!important;min-height:0!important;background-color:transparent!important;background-image:none!important;border-style:solid!important;border-width:var(--sc-ring)!important;border-color:var(--sc-color)!important;border-radius:50%!important;opacity:var(--sc-op)!important;overflow:visible!important;filter:" + OUT + "!important}"
+    + A + "{transition:transform .18s ease!important}"
+    + B + "{transition:none!important}"
+    + A + ":before{content:''!important;display:block!important;position:absolute!important;left:50%!important;top:calc(var(--sc-ring)/-2)!important;width:var(--sc-tw)!important;height:var(--sc-tick)!important;background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:0!important;transform:translate(-50%,-50%)!important;box-shadow:0 calc(var(--sc-size) - var(--sc-ring)) 0 var(--sc-color)!important}"
+    + A + ":after{content:''!important;display:block!important;position:absolute!important;top:50%!important;left:calc(var(--sc-ring)/-2)!important;width:var(--sc-tick)!important;height:var(--sc-tw)!important;background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:0!important;transform:translate(-50%,-50%)!important;box-shadow:calc(var(--sc-size) - var(--sc-ring)) 0 0 var(--sc-color)!important}"
+    + WRAP + ":after," + HOST + ":after{content:''!important;display:block!important;position:absolute!important;left:0!important;top:0!important;width:var(--sc-dot)!important;height:var(--sc-dot)!important;margin-left:calc(var(--sc-dot)/-2)!important;margin-top:calc(var(--sc-dot)/-2)!important;background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:50%!important;opacity:var(--sc-op)!important;pointer-events:none!important;filter:" + OUT + "!important}"
+    + HOST + ":after{left:50%!important;top:50%!important}"
+    + SPREAD + "{display:none!important}"
+    + ARROW + "{background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:0!important;opacity:var(--sc-op)!important;filter:none!important}"
+    + ARROW + ":first-child{left:calc(var(--sc-ring)/-2)!important;right:auto!important;top:50%!important;bottom:auto!important;width:var(--sc-tick)!important;height:var(--sc-tw)!important;transform:translateY(-50%)!important}"
+    + ARROW + ":nth-child(3){right:calc(var(--sc-ring)/-2)!important;left:auto!important;top:50%!important;bottom:auto!important;width:var(--sc-tick)!important;height:var(--sc-tw)!important;transform:translateY(-50%)!important}"
+    + ARROW + ":nth-child(2){top:calc(var(--sc-ring)/-2)!important;bottom:auto!important;left:50%!important;right:auto!important;width:var(--sc-tw)!important;height:var(--sc-tick)!important;transform:translateX(-50%)!important}"
+    + ARROW + ":nth-child(4){bottom:calc(var(--sc-ring)/-2)!important;top:auto!important;left:50%!important;right:auto!important;width:var(--sc-tw)!important;height:var(--sc-tick)!important;transform:translateX(-50%)!important}"
+    + "html[data-sc-kill] " + A + ",html[data-sc-kill] " + B + ",html[data-sc-kill] " + WRAP + ":after,html[data-sc-kill] " + HOST + ":after,html[data-sc-kill] " + ARROW + ",.hud-aim-crosshair_kill " + A + ",.hud-aim-crosshair_kill " + WRAP + ":after,.hud-aim-crosshair_kill " + ARROW + "{--sc-color:#f64932!important}"
+    + "html[data-sc-hit] " + A + ",html[data-sc-kill] " + A + ",.hud-aim-crosshair_hit " + A + ",.hud-aim-crosshair_kill " + A + "{animation:sc-pa .24s ease-out!important}"
+    + "html[data-sc-hit] " + B + ",html[data-sc-kill] " + B + "{animation:sc-pb .24s ease-out!important}"
+    + "html[data-sc-off] " + RING + ",html[data-sc-hide] " + RING + ",html[data-sc-off] " + WRAP + ":after,html[data-sc-hide] " + WRAP + ":after,html[data-sc-off] " + HOST + ":after,html[data-sc-hide] " + HOST + ":after,html[data-sc-off] " + ARROW + ",html[data-sc-hide] " + ARROW + "{opacity:0!important}"
+    + "@keyframes sc-pa{0%{transform:translate(-50%,-50%) scale(1)}45%{transform:translate(-50%,-50%) scale(1.3)}100%{transform:translate(-50%,-50%) scale(1)}}"
+    + "@keyframes sc-pb{0%{transform:scale(1)}45%{transform:scale(1.3)}100%{transform:scale(1)}}";
 
-  /* скрытие родного прицела: и со scoped-хешами, и без них */
-  var NATIVE = [A, B, ".hud-aim-crosshair__crosshair", ".hud-aim__container"].join(",");
-  var NATIVE_PARTS = [A + ":before", A + ":after", WRAP + ":after", ".hud-aim-crosshair__crosshair:before", ".hud-aim-crosshair__crosshair:after", ".hud-aim-crosshair__crosshair-wrapper:after"].join(",");
-  var NATIVE_MISC = [SPREAD, ARROW, ".hud-aim-crosshair__spread-container", ".hud-aim__arrow"].join(",");
-  CSS += NATIVE + "{background:none!important;background-image:none!important;border:0!important;box-shadow:none!important;filter:none!important}"
-    + NATIVE_PARTS + "{content:none!important;display:none!important}"
-    + NATIVE_MISC + "{display:none!important}";
-
-  var st = { off: false, hide: false, spread: 0, t1: 0, t2: 0, raf: 0, obs: null, poll: 0, hooked: null, last: 0, dead: false, img: null };
+  var st = { off: false, hide: false, spread: 0, t1: 0, t2: 0, raf: 0, obs: null, poll: 0, hooked: null, last: 0, dead: false };
 
   function q(s) { try { return D.querySelector(s); } catch (e) { return null; } }
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function vh(v) { return v * W.innerHeight / 100; }
   function flag(n, on) { if (on) ROOT.setAttribute(n, ""); else ROOT.removeAttribute(n); }
-
-  function ensureImg() {
-    var el = D.getElementById(IID);
-    if (!el) {
-      el = D.createElement("img");
-      el.id = IID;
-      el.alt = "";
-      el.draggable = false;
-      el.src = CFG.IMG || TEST_IMG;
-      (D.body || ROOT).appendChild(el);
-    } else if (el.parentElement !== (D.body || ROOT)) {
-      (D.body || ROOT).appendChild(el); /* если игра перерисовала body — вернуть */
-    }
-    st.img = el;
-    return el;
-  }
 
   function clearFlash() {
     clearTimeout(st.t1); clearTimeout(st.t2);
@@ -2238,22 +2199,31 @@ var yorenov = {
   }
 
   function readSpread() {
-    if (!CFG.SPREAD) return;
-    var extra = 0, el = q(SPREAD) || q(".hud-aim-crosshair__spread-container");
+    var extra = 0, el = q(SPREAD);
     if (el && el.style.width) {
       var raw = el.style.width, n = parseFloat(raw);
       if (!isNaN(n)) {
         var px = raw.indexOf("vh") > -1 ? vh(n) : raw.indexOf("vw") > -1 ? n * W.innerWidth / 100 : n;
         extra = Math.max(0, px - vh(1.86)) * 0.9;
       }
+    } else {
+      var box = q(B);
+      if (box && box.style.width) {
+        var w = parseFloat(box.style.width);
+        if (!isNaN(w) && w > 0) extra = Math.max(0, w / 48 - 1) * vh(2.2);
+      }
     }
+    extra = clamp(extra, 0, vh(7));
     if (Math.abs(extra - st.spread) > 0.4) { st.spread = extra; ROOT.style.setProperty("--sc-spread", extra.toFixed(2) + "px"); }
   }
 
   function sync() {
-    ensureImg();
-    var off = CFG.HIDE_ON_SCOPE && (!!q(SCOPE) || !!q(HIDDEN));
+    var off = !!q(SCOPE) || !!q(HIDDEN);
     if (off !== st.off) { st.off = off; flag("data-sc-off", off); }
+    var box = q(B), host = box ? box.parentElement : null;
+    var marked = D.querySelectorAll(".hud-aim.sc-host");
+    for (var i = 0; i < marked.length; i++) if (marked[i] !== host) marked[i].classList.remove("sc-host");
+    if (host && !host.classList.contains("sc-host")) host.classList.add("sc-host");
     hook();
   }
 
@@ -2264,46 +2234,21 @@ var yorenov = {
   }
 
   var api = {
-    version: "6.0.0",
+    version: "4.0.0",
     hit: function () { flash("hit"); return api; },
     kill: function () { flash("kill"); return api; },
     show: function () { st.hide = false; flag("data-sc-hide", false); return api; },
     hide: function () { st.hide = true; flag("data-sc-hide", true); return api; },
-
-    setImage: function (src) {
-      CFG.IMG = src || "";
-      ensureImg().src = CFG.IMG || TEST_IMG;
-      return api;
-    },
-    setSize: function (s) { CFG.SIZE = s; ROOT.style.setProperty("--sc-base", s); return api; },
-    setOpacity: function (o) { CFG.OPACITY = o; ROOT.style.setProperty("--sc-op", o); return api; },
-    setRotate: function (d) { CFG.ROTATE = d; ROOT.style.setProperty("--sc-rot", d + "deg"); return api; },
-    setOutline: function (w) { ROOT.style.setProperty("--sc-ow", w); return api; },
-    config: CFG,
-
-    /* диагностика: покажет в консоли, что не так */
-    debug: function () {
-      var el = D.getElementById(IID);
-      if (!el) { console.log("[SC] картинки нет в DOM!"); return; }
-      var cs = W.getComputedStyle(el), r = el.getBoundingClientRect();
-      console.log("[SC] element:", el);
-      console.log("[SC] rect:", Math.round(r.width) + "x" + Math.round(r.height), "at", Math.round(r.left) + "," + Math.round(r.top));
-      console.log("[SC] display:", cs.display, "| visibility:", cs.visibility, "| opacity:", cs.opacity, "| z:", cs.zIndex);
-      console.log("[SC] img complete:", el.complete, "| naturalWidth:", el.naturalWidth, "(0 = битый base64)");
-      console.log("[SC] flags:", ROOT.getAttribute("data-sc-off") !== null ? "OFF(scope)" : "", ROOT.getAttribute("data-sc-hide") !== null ? "HIDE" : "");
-      console.log("[SC] engine:", !!W.engine, "| hooked:", !!st.hooked);
-      return r;
-    },
-
     destroy: function () {
       st.dead = true;
       W.cancelAnimationFrame(st.raf); clearInterval(st.poll); clearTimeout(st.t1); clearTimeout(st.t2);
       if (st.obs) try { st.obs.disconnect(); } catch (e) {}
       if (st.hooked && st.hooked.off) try { st.hooked.off("HitDamage", onHit); } catch (e) {}
       var s = D.getElementById(SID); if (s) s.remove();
-      var im = D.getElementById(IID); if (im) im.remove();
+      var m = D.querySelectorAll(".hud-aim.sc-host");
+      for (var i = 0; i < m.length; i++) m[i].classList.remove("sc-host");
       ["data-sc-off", "data-sc-hide", "data-sc-hit", "data-sc-kill"].forEach(function (a) { ROOT.removeAttribute(a); });
-      ["--sc-spread", "--sc-base", "--sc-op", "--sc-rot", "--sc-ow"].forEach(function (p) { ROOT.style.removeProperty(p); });
+      ROOT.style.removeProperty("--sc-spread");
       try { delete W.SampCrosshair; } catch (e) { W.SampCrosshair = undefined; }
     }
   };
@@ -2312,13 +2257,12 @@ var yorenov = {
   var style = D.createElement("style");
   style.id = SID; style.textContent = CSS;
   (D.head || ROOT).appendChild(style);
-
   sync();
+
   st.obs = new MutationObserver(function () { sync(); });
   st.obs.observe(D.body || ROOT, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
-  st.poll = setInterval(function () { sync(); }, 700);
+  st.poll = setInterval(function () { if (!st.hooked) hook(); }, 700);
   st.raf = W.requestAnimationFrame(tick);
 
   W.SampCrosshair = api;
-  console.log("[SC] v6 запущен. Тестовый прицел должен быть виден по центру. Своё фото: SampCrosshair.setImage('data:image/png;base64,...')");
 })();
