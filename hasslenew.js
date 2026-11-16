@@ -2266,58 +2266,75 @@ var yorenov = {
 
   W.SampCrosshair = api;
 })();
-
 // ===========================================================================
-// ScriptLoader \u00b7 Crosshair Menu v3.0
+// ScriptLoader - Crosshair Menu v4.0
 // ---------------------------------------------------------------------------
-// \u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430 \u043f\u0440\u0438\u0446\u0435\u043b\u0430 \u0438\u0437 SampCrosshair (\u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0439 \u043c\u043e\u0434\u0443\u043b\u044c \u044d\u0442\u043e\u0433\u043e \u0444\u0430\u0439\u043b\u0430).
-//   \u0410\u041a\u0422\u0418\u0412\u0410\u0426\u0418\u042f:  \u041f\u0440\u0430\u0432\u044b\u0439 Shift (\u043e\u0441\u043d\u043e\u0432\u043d\u0430\u044f) \u00b7 F9/F10 (\u0437\u0430\u043f\u0430\u0441\u043d\u044b\u0435) \u00b7 Esc \u2014 \u0437\u0430\u043a\u0440\u044b\u0442\u044c
-//               + \u043c\u0430\u043b\u0435\u043d\u044c\u043a\u0430\u044f \u043a\u043d\u043e\u043f\u043a\u0430 "+" \u0432 \u043b\u0435\u0432\u043e\u043c \u0432\u0435\u0440\u0445\u043d\u0435\u043c \u0443\u0433\u043b\u0443 (\u043a\u043b\u0438\u043a)
-//   - 5 \u043f\u0440\u0435\u0441\u0435\u0442\u043e\u0432: \u041f\u043e\u043b\u043d\u044b\u0439 / \u041a\u0440\u0435\u0441\u0442 / \u0422\u043e\u0447\u043a\u0430 / \u041a\u0440\u0443\u0433 / \u0422-\u0444\u043e\u0440\u043c\u0430
-//   - \u0446\u0432\u0435\u0442 (\u0441\u0432\u043e\u0442\u0447\u0438 + HEX), \u0440\u0430\u0437\u043c\u0435\u0440, \u043d\u0430\u0441\u0435\u0447\u043a\u0438, \u0442\u043e\u043b\u0449\u0438\u043d\u0430, \u043a\u043e\u043b\u044c\u0446\u043e, \u0442\u043e\u0447\u043a\u0430, \u044f\u0440\u043a\u043e\u0441\u0442\u044c
-//   - \u0436\u0438\u0432\u043e\u0439 \u043f\u0440\u0435\u0434\u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440
-//   - \u0430\u0432\u0442\u043e\u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0432 JSON: Scriptloader-crosshair.json (config-\u0441\u0435\u0440\u0432\u0435\u0440
-//     \u043b\u043e\u0430\u0434\u0435\u0440\u0430, \u043a\u0430\u043a \u0443 /radar; fallback \u2014 localStorage)
-//   - \u0448\u0440\u0438\u0444\u0442\u044b GothamPro \u2014 \u0442\u0435 \u0436\u0435, \u0447\u0442\u043e \u0432\u043e \u0432\u0441\u0451\u043c \u0445\u0443\u0434\u0435
-//   - \u043c\u0435\u043d\u044e \u0441\u043e\u0431\u0440\u0430\u043d\u043e \u0438\u0437 \u041e\u0414\u041d\u041e\u0413\u041e HTML-\u0448\u0430\u0431\u043b\u043e\u043d\u0430 (\u043f\u0440\u043e\u0441\u0442\u0430\u044f \u0441\u0442\u0440\u0443\u043a\u0442\u0443\u0440\u0430, \u043d\u0430\u0434\u0451\u0436\u043d\u0430\u044f
-//     \u043e\u0442\u0440\u0438\u0441\u043e\u0432\u043a\u0430 \u0432 cohtml: \u0431\u0435\u0437 flex-gap, \u0431\u0435\u0437 fixed, \u043e\u0431\u0451\u0440\u0442\u043a\u0430 100vw/100vh)
-//   - \u0432\u0435\u0441\u044c \u0444\u0430\u0439\u043b \u2014 \u0447\u0438\u0441\u0442\u044b\u0439 ASCII (\u-\u044d\u043a\u0440\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0435), \u043a\u043e\u0434\u0438\u0440\u043e\u0432\u043a\u0443 \u043d\u0435 \u043b\u043e\u043c\u0430\u0435\u0442
+// Custom crosshair rendered by OUR OWN overlay (#xh-game); the game's
+// SampCrosshair elements are hidden. The menu preview uses THE SAME markup
+// (.xh-cross) and THE SAME css rules as the game overlay, so
+// preview == game 1:1 by construction (no pseudo-elements, no box-shadow
+// tricks - plain divs only, safe for cohtml).
+//   ACTIVATION: Right Shift (main) / F9, F10 (spare) / Esc - close / "+" chip
+//   - 5 shapes: full / cross / dot / circle / t
+//   - SEPARATE color for ring, ticks and dot (tabs + swatches + hex)
+//   - sliders: size, ring stroke, tick length, tick width, gap, dot, opacity
+//   - dynamic spread kept: size follows the game --sc-spread (rAF of
+//     SampCrosshair); kill/hit red flash kept via data-sc-kill / data-sc-hit;
+//     sniper scope auto-hide kept via data-sc-off / data-sc-hide
+//   - autosave to Scriptloader-crosshair.json (loader config server,
+//     localStorage fallback)
+//   - fonts: GothamPro (same as the whole HUD)
+//   - whole file is pure ASCII (cyrillic via \u escapes)
 // ===========================================================================
 (function () {
-    'use strict';
+    "use strict";
     if (window.__xhMenu) return;
-    window.__xhMenu = { version: "3.0" };   // \u0437\u0430\u0449\u0438\u0442\u0430 \u043e\u0442 \u043f\u043e\u0432\u0442\u043e\u0440\u043d\u043e\u0439 \u043e\u0446\u0435\u043d\u043a\u0438 \u0432 \u044d\u0442\u043e\u043c \u0436\u0435 \u0432\u044c\u044e
+    window.__xhMenu = { version: "4.0" };
 
     var CFG_FILE = "Scriptloader-crosshair.json";
     var DEFAULTS = {
         shape: "full",      // full | cross | dot | circle | t
-        color: "#FFFFFF",
-        size: 3.15,         // vh
-        ring: 0.04,         // vh \u2014 \u0442\u043e\u043b\u0449\u0438\u043d\u0430 \u043a\u043e\u043b\u044c\u0446\u0430
-        tick: 0.68,         // vh \u2014 \u0434\u043b\u0438\u043d\u0430 \u043d\u0430\u0441\u0435\u0447\u0435\u043a
-        tickw: 0.295,       // vh \u2014 \u0442\u043e\u043b\u0449\u0438\u043d\u0430 \u043d\u0430\u0441\u0435\u0447\u0435\u043a
-        dot: 0.21,          // vh \u2014 \u0440\u0430\u0437\u043c\u0435\u0440 \u0442\u043e\u0447\u043a\u0438
+        colorRing: "#FFFFFF",
+        colorTick: "#FFFFFF",
+        colorDot: "#FFFFFF",
+        size: 3.2,          // vh - ring outer diameter (crosshair width)
+        ring: 0.14,         // vh - ring stroke width
+        tick: 0.68,         // vh - tick length
+        tickw: 0.22,        // vh - tick width
+        gap: 0.55,          // vh - gap between ring edge and tick
+        dot: 0.21,          // vh - dot diameter
         opacity: 1.0
     };
     var PRESETS = [
-        { key: "full",   name: "\u041f\u043e\u043b\u043d\u044b\u0439",  color: "#FFFFFF",
-          cfg: { shape: "full",   color: "#FFFFFF", size: 3.15, ring: 0.04, tick: 0.68, tickw: 0.295, dot: 0.21,  opacity: 1 } },
-        { key: "cross",  name: "\u041a\u0440\u0435\u0441\u0442",   color: "#4CAF50",
-          cfg: { shape: "cross",  color: "#4CAF50", size: 2.40, ring: 0,    tick: 0.90, tickw: 0.26,  dot: 0.20,  opacity: 1 } },
-        { key: "dot",    name: "\u0422\u043e\u0447\u043a\u0430",   color: "#00E5FF",
-          cfg: { shape: "dot",    color: "#00E5FF", size: 3.15, ring: 0,    tick: 0,    tickw: 0,     dot: 0.34,  opacity: 1 } },
-        { key: "circle", name: "\u041a\u0440\u0443\u0433",    color: "#FFD600",
-          cfg: { shape: "circle", color: "#FFD600", size: 3.40, ring: 0.07, tick: 0,    tickw: 0,     dot: 0,     opacity: 1 } },
+        { key: "full",   name: "\u041f\u043e\u043b\u043d\u044b\u0439", color: "#FFFFFF",
+          cfg: { shape: "full",   colorRing: "#FFFFFF", colorTick: "#FFFFFF", colorDot: "#FFFFFF",
+                 size: 3.2, ring: 0.14, tick: 0.68, tickw: 0.22, gap: 0.55, dot: 0.21, opacity: 1 } },
+        { key: "cross",  name: "\u041a\u0440\u0435\u0441\u0442", color: "#4CAF50",
+          cfg: { shape: "cross",  colorRing: "#4CAF50", colorTick: "#4CAF50", colorDot: "#4CAF50",
+                 size: 2.6, ring: 0, tick: 0.90, tickw: 0.26, gap: 0.62, dot: 0.20, opacity: 1 } },
+        { key: "dot",    name: "\u0422\u043e\u0447\u043a\u0430", color: "#00E5FF",
+          cfg: { shape: "dot",    colorRing: "#00E5FF", colorTick: "#00E5FF", colorDot: "#00E5FF",
+                 size: 3.2, ring: 0, tick: 0, tickw: 0, gap: 0, dot: 0.38, opacity: 1 } },
+        { key: "circle", name: "\u041a\u0440\u0443\u0433", color: "#FFD600",
+          cfg: { shape: "circle", colorRing: "#FFD600", colorTick: "#FFD600", colorDot: "#FFD600",
+                 size: 3.6, ring: 0.12, tick: 0, tickw: 0, gap: 0, dot: 0, opacity: 1 } },
         { key: "t",      name: "\u0422-\u0444\u043e\u0440\u043c\u0430", color: "#FF4444",
-          cfg: { shape: "t",      color: "#FF4444", size: 2.60, ring: 0,    tick: 0.90, tickw: 0.26,  dot: 0.20,  opacity: 1 } }
+          cfg: { shape: "t",      colorRing: "#FF4444", colorTick: "#FF4444", colorDot: "#FF4444",
+                 size: 2.6, ring: 0, tick: 0.90, tickw: 0.26, gap: 0.62, dot: 0.20, opacity: 1 } }
     ];
     var SWATCHES = ["#FFFFFF", "#FF4444", "#FF7A00", "#FFD600", "#4CAF50", "#00E5FF", "#9C6AFF", "#FF6EC7"];
+    var ETABS = [
+        { key: "colorRing", name: "\u041a\u043e\u043b\u044c\u0446\u043e" },
+        { key: "colorTick", name: "\u041d\u0430\u0441\u0435\u0447\u043a\u0438" },
+        { key: "colorDot",  name: "\u0422\u043e\u0447\u043a\u0430" }
+    ];
 
-    var cfg = merge({}, DEFAULTS);  // \u0441\u0440\u0430\u0437\u0443 \u0434\u0435\u0444\u043e\u043b\u0442\u044b: build() \u0447\u0438\u0442\u0430\u0435\u0442 cfg \u0434\u043e \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438 \u043a\u043e\u043d\u0444\u0438\u0433\u0430
-    var root = null, panel = null, stage = null, chip = null;
+    var cfg = merge({}, DEFAULTS);   // defaults first: build() reads cfg before config loads
+    var root = null, panel = null, stage = null, hexInput = null, chip = null;
     var sliders = {};   // key -> {paint}
-    var tiles = {};     // key -> element
-    var hexInput = null;
+    var tiles = {};     // shape key -> element
+    var etabs = {};     // color key -> element
+    var activeEl = "colorTick";
     var saveTimer = 0;
     var dragged = false;
 
@@ -2325,14 +2342,12 @@ var yorenov = {
     function el(tag, cls) { var e = document.createElement(tag); if (cls) e.className = cls; return e; }
     function px(vh) { return Math.round(vh * window.innerHeight / 100 * 10) / 10; }
     function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
-
     function merge(dst, src) {
         for (var k in DEFAULTS) if (Object.prototype.hasOwnProperty.call(DEFAULTS, k)) {
             if (src && src[k] !== undefined && src[k] !== null) dst[k] = src[k];
         }
         return dst;
     }
-
     function now() { return (window.performance && performance.now) ? performance.now() : Date.now(); }
 
     // ---------------------------------------------------------------- toast
@@ -2373,7 +2388,18 @@ var yorenov = {
 
     function loadCfg(then) {
         var apply = function (data) {
-            if (data) { try { merge(cfg, JSON.parse(data)); } catch (e) {} }
+            if (data) {
+                try {
+                    var saved = JSON.parse(data);
+                    merge(cfg, saved);
+                    // v3 -> v4 migration: one shared "color" spreads to all elements
+                    if (saved.color && !saved.colorRing) {
+                        cfg.colorRing = saved.color;
+                        cfg.colorTick = saved.color;
+                        cfg.colorDot = saved.color;
+                    }
+                } catch (e) {}
+            }
             if (then) then();
         };
         try {
@@ -2390,40 +2416,47 @@ var yorenov = {
         } catch (e) { apply(null); }
     }
 
-    // ------------------------------------------------------------ apply to game
+    // ------------------------------------------------------------ apply to game / preview
     function applyGame() {
         if (!cfg) return;
         var R = document.documentElement;
-        // inline-\u0441\u0442\u0438\u043b\u0438 \u043d\u0430 <html> \u043f\u0435\u0440\u0435\u0431\u0438\u0432\u0430\u044e\u0442 :root{...} \u0438\u0437 \u0441\u0442\u0438\u043b\u0435\u0439 SampCrosshair
-        R.style.setProperty("--sc-color", cfg.color);
-        R.style.setProperty("--sc-op", String(cfg.opacity));
-        R.style.setProperty("--sc-base", cfg.size + "vh");
-        R.style.setProperty("--sc-ring", cfg.ring + "vh");
-        R.style.setProperty("--sc-tick", cfg.tick + "vh");
-        R.style.setProperty("--sc-tw", cfg.tickw + "vh");
-        R.style.setProperty("--sc-dot", cfg.dot + "vh");
-        R.setAttribute("data-xh-shape", cfg.shape);
+        R.style.setProperty("--x-base", cfg.size + "vh");
+        R.style.setProperty("--x-ringw", cfg.ring + "vh");
+        R.style.setProperty("--x-tick", cfg.tick + "vh");
+        R.style.setProperty("--x-tw", cfg.tickw + "vh");
+        R.style.setProperty("--x-gap", cfg.gap + "vh");
+        R.style.setProperty("--x-dot", cfg.dot + "vh");
+        R.style.setProperty("--x-op", String(cfg.opacity));
+        R.style.setProperty("--x-c-ring", cfg.colorRing);
+        R.style.setProperty("--x-c-tick", cfg.colorTick);
+        R.style.setProperty("--x-c-dot", cfg.colorDot);
     }
 
     function applyPreview() {
         if (!stage || !cfg) return;
-        stage.setAttribute("data-xh-shape", cfg.shape);
-        stage.style.setProperty("--p-color", cfg.color);
-        stage.style.setProperty("--p-op", String(cfg.opacity));
-        stage.style.setProperty("--p-size", px(cfg.size) + "px");
-        stage.style.setProperty("--p-ring", px(cfg.ring) + "px");
-        stage.style.setProperty("--p-tick", px(cfg.tick) + "px");
-        stage.style.setProperty("--p-tickw", px(cfg.tickw) + "px");
-        stage.style.setProperty("--p-dot", px(cfg.dot) + "px");
-        if (panel) panel.style.setProperty("--xh-accent", cfg.color);
+        stage.style.setProperty("--x-base", px(cfg.size) + "px");
+        stage.style.setProperty("--x-ringw", px(cfg.ring) + "px");
+        stage.style.setProperty("--x-tick", px(cfg.tick) + "px");
+        stage.style.setProperty("--x-tw", px(cfg.tickw) + "px");
+        stage.style.setProperty("--x-gap", px(cfg.gap) + "px");
+        stage.style.setProperty("--x-dot", px(cfg.dot) + "px");
+        stage.style.setProperty("--x-op", String(cfg.opacity));
+        stage.style.setProperty("--x-c-ring", cfg.colorRing);
+        stage.style.setProperty("--x-c-tick", cfg.colorTick);
+        stage.style.setProperty("--x-c-dot", cfg.colorDot);
+        if (panel) panel.style.setProperty("--xh-accent", cfg.colorTick);
     }
 
-    function applyAll() { applyGame(); applyPreview(); refreshUi(); }
+    function applyShape() {
+        var cs = document.querySelectorAll(".xh-cross");
+        for (var i = 0; i < cs.length; i++) cs[i].setAttribute("data-xh-shape", cfg.shape);
+    }
 
-    // ------------------------------------------------------------ styles
-    // A/B/WRAP/HOST/AR \u2014 \u0441\u0435\u043b\u0435\u043a\u0442\u043e\u0440\u044b \u043f\u0440\u0438\u0446\u0435\u043b\u0430 \u0438\u0433\u0440\u044b: \u043f\u0430\u0440\u0430 \u00ab\u0441 data-v \u0430\u0442\u0440\u0438\u0431\u0443\u0442\u043e\u043c\u00bb
-    // (\u0442\u043e\u0447\u043d\u0430\u044f \u043a\u043e\u043f\u0438\u044f \u0438\u0437 SampCrosshair) + \u043a\u043b\u0430\u0441\u0441 \u0431\u0435\u0437 \u0430\u0442\u0440\u0438\u0431\u0443\u0442\u0430 (\u043d\u0430 \u0441\u043b\u0443\u0447\u0430\u0439 \u0441\u043c\u0435\u043d\u044b
-    // \u0445\u044d\u0448\u0435\u0439 \u0432 \u043d\u043e\u0432\u044b\u0445 \u0431\u0438\u043b\u0434\u0430\u0445 \u0438\u0433\u0440\u044b). !important \u0432 \u043e\u0431\u043e\u0438\u0445 \u0441\u043b\u0443\u0447\u0430\u044f\u0445 \u0432\u044b\u0438\u0433\u0440\u044b\u0432\u0430\u0435\u0442.
+    function applyAll() { applyGame(); applyPreview(); applyShape(); refreshUi(); }
+
+    // ------------------------------------------------------------ selectors of the game crosshair
+    // Pair "with data-v attribute" (exact copy from SampCrosshair) + class
+    // without attribute (in case hashes change in new game builds).
     var A  = '.hud-aim-crosshair__crosshair[data-v-bef93661]';
     var A2 = '.hud-aim-crosshair__crosshair';
     var B  = '.hud-aim__container[data-v-7f96fa59]';
@@ -2434,44 +2467,56 @@ var yorenov = {
     var H2 = '.hud-aim.sc-host';
     var AR = '.hud-aim__arrow[data-v-7f96fa59]';
     var AR2 = '.hud-aim__arrow';
+    // everything SampCrosshair draws the crosshair with: rings (A, B),
+    // ticks (A:before/:after + 4 ARROW), dot (WRAP:after, HOST:after)
+    var HIDE_SEL = A + "," + A2 + "," + B + "," + B2 + ","
+        + A + ":before," + A + ":after," + A2 + ":before," + A2 + ":after,"
+        + W + ":after," + W2 + ":after," + H + ":after," + H2 + ":after,"
+        + AR + "," + AR2;
 
-    function rule(sel, body) { return sel + "{" + body + "}"; }
-    function both(pairA, pairB, body) {
-        return rule(pairA, body) + rule(pairB, body);
-    }
-
+    // ------------------------------------------------------------ styles
     var CSS = ""
-    // --- \u0448\u0440\u0438\u0444\u0442\u044b HUD (GothamPro, \u043a\u0430\u043a \u0432\u043e \u0432\u0441\u0451\u043c \u0445\u0443\u0434\u0435) ---
+    // --- HUD fonts (GothamPro, same as the whole HUD) ---
     + "@font-face{font-family:'GothamPro';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/refs/heads/main/gothampro.ttf') format('truetype');font-weight:400;font-style:normal}"
     + "@font-face{font-family:'GothamPro Medium';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/refs/heads/main/gothampro_medium.ttf') format('truetype');font-weight:500;font-style:normal}"
     + "@font-face{font-family:'GothamPro Bold';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/refs/heads/main/gothampro_bold.ttf') format('truetype');font-weight:700;font-style:normal}"
     + "@font-face{font-family:'GothamPro Black';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/refs/heads/main/gothampro_black.ttf') format('truetype');font-weight:900;font-style:normal}"
 
-    // --- \u0444\u043e\u0440\u043c\u0430 \u043f\u0440\u0438\u0446\u0435\u043b\u0430 \u0432 \u0438\u0433\u0440\u0435 ---
-    // cross: \u0431\u0435\u0437 \u043a\u043e\u043b\u044c\u0446\u0430
-    + 'html[data-xh-shape="cross"] ' + both(A, A2, "border-width:0!important")
-    + 'html[data-xh-shape="cross"] ' + both(B, B2, "border-width:0!important")
-    // dot: \u0442\u043e\u043b\u044c\u043a\u043e \u0442\u043e\u0447\u043a\u0430
-    + 'html[data-xh-shape="dot"] ' + both(A, A2, "border-width:0!important")
-    + 'html[data-xh-shape="dot"] ' + both(B, B2, "border-width:0!important")
-    + 'html[data-xh-shape="dot"] ' + A + ":before," + 'html[data-xh-shape="dot"] ' + A + ":after,"
-    + 'html[data-xh-shape="dot"] ' + A2 + ":before," + 'html[data-xh-shape="dot"] ' + A2 + ":after"
-    + "{width:0!important;height:0!important;box-shadow:none!important}"
-    + 'html[data-xh-shape="dot"] ' + both(AR, AR2, "opacity:0!important")
-    // circle: \u0442\u043e\u043b\u044c\u043a\u043e \u043a\u043e\u043b\u044c\u0446\u043e
-    + 'html[data-xh-shape="circle"] ' + A + ":before," + 'html[data-xh-shape="circle"] ' + A + ":after,"
-    + 'html[data-xh-shape="circle"] ' + A2 + ":before," + 'html[data-xh-shape="circle"] ' + A2 + ":after"
-    + "{width:0!important;height:0!important;box-shadow:none!important}"
-    + 'html[data-xh-shape="circle"] ' + both(AR, AR2, "opacity:0!important")
-    + 'html[data-xh-shape="circle"] ' + both(W + ":after", W2 + ":after", "width:0!important;height:0!important")
-    + 'html[data-xh-shape="circle"] ' + both(H + ":after", H2 + ":after", "width:0!important;height:0!important")
-    // t: \u0432\u0435\u0440\u0445\u043d\u044f\u044f \u043d\u0430\u0441\u0435\u0447\u043a\u0430 \u0443\u0431\u0440\u0430\u043d\u0430 (\u043d\u0438\u0436\u043d\u044f\u044f \u043e\u0441\u0442\u0430\u0451\u0442\u0441\u044f)
-    + 'html[data-xh-shape="t"] ' + A + ":before," + 'html[data-xh-shape="t"] ' + A2 + ":before"
-    + "{top:calc(100% + var(--sc-ring,0px)/2)!important;box-shadow:none!important}"
-    + 'html[data-xh-shape="t"] ' + AR + ":nth-child(2)," + 'html[data-xh-shape="t"] ' + AR2 + ":nth-child(2)"
-    + "{opacity:0!important}"
+    // --- hide the game crosshair completely: our overlay replaces it ---
+    + "html[data-xh-own] " + HIDE_SEL + "{opacity:0!important}"
 
-    // --- \u043e\u043a\u043d\u043e \u043c\u0435\u043d\u044e (\u043e\u0431\u0451\u0440\u0442\u043a\u0430 100vw/100vh absolute \u2014 \u043a\u0430\u043a \u0443 \u0442\u043e\u0441\u0442\u043e\u0432 \u0432 \u0445\u0443\u0434\u0435) ---
+    // --- our game overlay ---
+    + "#xh-game{position:absolute;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:2147482998}"
+    + "html[data-sc-off] #xh-game,html[data-sc-hide] #xh-game{opacity:0!important}"
+    + "html[data-sc-kill] #xh-game{--x-c-ring:#f64932;--x-c-tick:#f64932;--x-c-dot:#f64932}"
+    + "html[data-sc-hit] #xh-game{--x-c-ring:#ffb199;--x-c-tick:#ffb199;--x-c-dot:#ffb199}"
+
+    // --- shared crosshair: ONE markup (.xh-cross) + ONE css for game and preview ---
+    + ".xh-cross{position:absolute;left:50%;top:50%;width:0;height:0;opacity:var(--x-op,1);"
+    + "--xh-size:calc(var(--x-base,3.2vh) + var(--sc-spread,0px));"
+    + "filter:drop-shadow(.09vh 0 0 rgba(0,0,0,.75)) drop-shadow(-.09vh 0 0 rgba(0,0,0,.75))"
+    + " drop-shadow(0 .09vh 0 rgba(0,0,0,.75)) drop-shadow(0 -.09vh 0 rgba(0,0,0,.75))}"
+    + ".xhc-ring{position:absolute;left:50%;top:50%;width:var(--xh-size);height:var(--xh-size);"
+    + "transform:translate(-50%,-50%);box-sizing:border-box;border-style:solid;"
+    + "border-width:var(--x-ringw,.14vh);border-color:var(--x-c-ring,#fff);border-radius:50%;background-color:transparent}"
+    + ".xhc-tick{position:absolute;background-color:var(--x-c-tick,#fff)}"
+    + ".xhc-t{left:50%;top:calc(var(--xh-size) / -2 - var(--x-gap,.55vh) - var(--x-tick,.68vh));"
+    + "width:var(--x-tw,.22vh);height:var(--x-tick,.68vh);transform:translateX(-50%)}"
+    + ".xhc-b{left:50%;top:calc(var(--xh-size) / 2 + var(--x-gap,.55vh));"
+    + "width:var(--x-tw,.22vh);height:var(--x-tick,.68vh);transform:translateX(-50%)}"
+    + ".xhc-l{top:50%;left:calc(var(--xh-size) / -2 - var(--x-gap,.55vh) - var(--x-tick,.68vh));"
+    + "width:var(--x-tick,.68vh);height:var(--x-tw,.22vh);transform:translateY(-50%)}"
+    + ".xhc-r{top:50%;left:calc(var(--xh-size) / 2 + var(--x-gap,.55vh));"
+    + "width:var(--x-tick,.68vh);height:var(--x-tw,.22vh);transform:translateY(-50%)}"
+    + ".xhc-dot{position:absolute;left:50%;top:50%;width:var(--x-dot,.21vh);height:var(--x-dot,.21vh);"
+    + "transform:translate(-50%,-50%);background-color:var(--x-c-dot,#fff);border-radius:50%}"
+    // shapes: which elements are visible
+    + '.xh-cross[data-xh-shape="cross"] .xhc-ring,.xh-cross[data-xh-shape="cross"] .xhc-dot{display:none}'
+    + '.xh-cross[data-xh-shape="dot"] .xhc-ring,.xh-cross[data-xh-shape="dot"] .xhc-tick{display:none}'
+    + '.xh-cross[data-xh-shape="circle"] .xhc-tick,.xh-cross[data-xh-shape="circle"] .xhc-dot{display:none}'
+    + '.xh-cross[data-xh-shape="t"] .xhc-ring,.xh-cross[data-xh-shape="t"] .xhc-dot,.xh-cross[data-xh-shape="t"] .xhc-t{display:none}'
+
+    // --- menu window (100vw/100vh absolute wrapper, like HUD toasts) ---
     + "#xh-menu-root{position:absolute;left:0;top:0;width:100vw;height:100vh;z-index:2147483000;display:none;"
     + "font-family:'GothamPro','GothamPro Medium',Arial,sans-serif}"
     + "#xh-menu-root.xh-open{display:block}"
@@ -2491,9 +2536,9 @@ var yorenov = {
     + ".xh-left{width:330px;flex-shrink:0;margin-right:20px}"
     + ".xh-right{flex:1;display:flex;flex-direction:column}"
     + ".xh-sec{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:#8a93a6;margin:0 0 9px}"
-    + ".xh-sec.xh-mt{margin-top:16px}"
+    + ".xh-sec.xh-mt{margin-top:14px}"
 
-    // \u043f\u0440\u0435\u0441\u0435\u0442\u044b
+    // presets
     + ".xh-presets{display:flex}"
     + ".xh-tile{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;"
     + "padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;cursor:pointer;color:#fff}"
@@ -2504,7 +2549,16 @@ var yorenov = {
     + ".xh-tile .xh-tname{font-size:9px;color:#aab2c0;letter-spacing:.4px;margin-top:5px}"
     + ".xh-tile.xh-active .xh-tname{color:#fff}"
 
-    // \u0446\u0432\u0435\u0442\u0430
+    // element tabs (which element is being painted)
+    + ".xh-etabs{display:flex;margin-bottom:9px}"
+    + ".xh-etab{flex:1;text-align:center;font-size:10.5px;letter-spacing:.4px;color:#aab2c0;"
+    + "background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:7px;"
+    + "padding:6px 0;cursor:pointer}"
+    + ".xh-etab + .xh-etab{margin-left:6px}"
+    + ".xh-etab:hover{background:rgba(255,255,255,.08)}"
+    + ".xh-etab.xh-active{color:#fff;border-color:var(--xh-accent);background:rgba(255,255,255,.08)}"
+
+    // colors
     + ".xh-swatches{display:flex;align-items:center}"
     + ".xh-sw{width:22px;height:22px;border-radius:6px;border:1px solid rgba(255,255,255,.18);cursor:pointer}"
     + ".xh-sw + .xh-sw{margin-left:7px}"
@@ -2515,8 +2569,8 @@ var yorenov = {
     + ".xh-hex:focus{border-color:rgba(255,255,255,.3)}"
     + ".xh-hexlab{font-size:10px;color:#6b7386;margin-left:8px;letter-spacing:.3px}"
 
-    // \u0441\u043b\u0430\u0439\u0434\u0435\u0440\u044b
-    + ".xh-rowtop{display:flex;justify-content:space-between;align-items:baseline;margin:11px 0 6px}"
+    // sliders
+    + ".xh-rowtop{display:flex;justify-content:space-between;align-items:baseline;margin:9px 0 5px}"
     + ".xh-lab{font-size:11.5px;color:#c7ceda;letter-spacing:.3px}"
     + ".xh-val{font-family:'GothamPro Bold',Arial;font-size:11px;color:var(--xh-accent)}"
     + ".xh-slider{position:relative;height:16px;cursor:pointer}"
@@ -2526,44 +2580,29 @@ var yorenov = {
     + "border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.5)}"
     + ".xh-slider:hover .xh-thumb{box-shadow:0 0 0 4px rgba(255,255,255,.08),0 1px 4px rgba(0,0,0,.5)}"
 
-    // \u043f\u0440\u0435\u0434\u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440
-    + ".xh-stage{position:relative;height:216px;border-radius:10px;border:1px solid rgba(255,255,255,.07);"
+    // preview
+    + ".xh-stage{position:relative;height:200px;border-radius:10px;border:1px solid rgba(255,255,255,.07);"
     + "background:radial-gradient(120% 90% at 50% 12%,#1b2130 0%,#0b0e14 72%);overflow:hidden}"
     + ".xh-stage .xh-grid{position:absolute;left:0;top:0;width:100%;height:100%;"
     + "background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);"
     + "background-size:27px 27px}"
-    + ".xh-cross{position:absolute;left:50%;top:50%;width:var(--p-size);height:var(--p-size);"
-    + "margin-left:calc(var(--p-size) / -2);margin-top:calc(var(--p-size) / -2);border-style:solid;"
-    + "border-width:var(--p-ring);border-color:var(--p-color);border-radius:50%;opacity:var(--p-op);"
-    + "filter:drop-shadow(0 0 2px rgba(0,0,0,.8))}"
-    + ".xh-cross:before{content:'';position:absolute;left:50%;top:calc(var(--p-ring) / -2);width:var(--p-tickw);height:var(--p-tick);"
-    + "background:var(--p-color);transform:translate(-50%,-50%);box-shadow:0 calc(var(--p-size) - var(--p-ring)) 0 var(--p-color)}"
-    + ".xh-cross:after{content:'';position:absolute;top:50%;left:calc(var(--p-ring) / -2);width:var(--p-tick);height:var(--p-tickw);"
-    + "background:var(--p-color);transform:translate(-50%,-50%);box-shadow:calc(var(--p-size) - var(--p-ring)) 0 0 var(--p-color)}"
-    + ".xh-dotp{position:absolute;left:50%;top:50%;width:var(--p-dot);height:var(--p-dot);"
-    + "margin-left:calc(var(--p-dot) / -2);margin-top:calc(var(--p-dot) / -2);"
-    + "background:var(--p-color);border-radius:50%;opacity:var(--p-op);filter:drop-shadow(0 0 2px rgba(0,0,0,.8))}"
-    + '.xh-stage[data-xh-shape="cross"] .xh-cross,.xh-stage[data-xh-shape="dot"] .xh-cross{border-width:0}'
-    + '.xh-stage[data-xh-shape="dot"] .xh-cross:before,.xh-stage[data-xh-shape="dot"] .xh-cross:after,'
-    + '.xh-stage[data-xh-shape="circle"] .xh-cross:before,.xh-stage[data-xh-shape="circle"] .xh-cross:after{width:0;height:0;box-shadow:none}'
-    + '.xh-stage[data-xh-shape="t"] .xh-cross:before{top:calc(100% + var(--p-ring) / 2);box-shadow:none}'
     + ".xh-stagehint{font-size:10px;color:#6b7386;margin-top:8px;line-height:1.6;letter-spacing:.3px}"
 
-    // \u043d\u0438\u0437
+    // footer
     + ".xh-footer{display:flex;align-items:center;padding:12px 20px 16px;border-top:1px solid rgba(255,255,255,.07)}"
     + ".xh-btn{font-family:'GothamPro Bold',Arial;font-size:11px;letter-spacing:1px;color:#e8ecf3;"
     + "background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px 16px;cursor:pointer}"
     + ".xh-btn:hover{background:rgba(255,255,255,.12)}"
     + ".xh-note{font-size:10px;color:#6b7386;letter-spacing:.3px;margin-left:auto}"
 
-    // \u043a\u043d\u043e\u043f\u043a\u0430-\u0430\u043a\u0442\u0438\u0432\u0430\u0442\u043e\u0440 \u0432 \u0443\u0433\u043b\u0443
+    // activator chip
     + "#xh-chip{position:absolute;left:16px;top:16px;width:24px;height:24px;border-radius:50%;"
     + "background:rgba(16,19,24,.6);border:1px solid rgba(255,255,255,.16);color:#cfd6e4;"
     + "display:flex;align-items:center;justify-content:center;font-family:Arial;font-size:15px;line-height:1;cursor:pointer;"
     + "z-index:2147482999;opacity:.28;pointer-events:auto;-webkit-user-select:none;user-select:none}"
     + "#xh-chip:hover{opacity:1}";
 
-    // ------------------------------------------------------------ HTML-\u0448\u0430\u0431\u043b\u043e\u043d \u043c\u0435\u043d\u044e
+    // ------------------------------------------------------------ HTML template
     var MENU_HTML = ""
     + '<div id="xh-menu-root">'
     +   '<div class="xh-backdrop"></div>'
@@ -2579,11 +2618,12 @@ var yorenov = {
     +       '<div class="xh-left">'
     +         '<div class="xh-sec">\u0424\u043e\u0440\u043c\u0430</div>'
     +         '<div class="xh-presets" id="xh-presets"></div>'
-    +         '<div class="xh-sec xh-mt">\u0426\u0432\u0435\u0442</div>'
+    +         '<div class="xh-sec xh-mt">\u0426\u0432\u0435\u0442\u0430</div>'
+    +         '<div class="xh-etabs" id="xh-etabs"></div>'
     +         '<div class="xh-swatches" id="xh-swatches"></div>'
     +         '<div class="xh-hexwrap">'
     +           '<input class="xh-hex" id="xh-hex" type="text" maxlength="7" spellcheck="false">'
-    +           '<span class="xh-hexlab">HEX-\u043a\u043e\u0434, \u043d\u0430\u043f\u0440\u0438\u043c\u0435\u0440 #FF4444</span>'
+    +           '<span class="xh-hexlab">HEX-\u043a\u043e\u0434 \u0430\u043a\u0442\u0438\u0432\u043d\u043e\u0433\u043e \u044d\u043b\u0435\u043c\u0435\u043d\u0442\u0430</span>'
     +         '</div>'
     +         '<div class="xh-sec xh-mt">\u0420\u0430\u0437\u043c\u0435\u0440 \u0438 \u0442\u043e\u043b\u0449\u0438\u043d\u0430</div>'
     +         '<div id="xh-sliders"></div>'
@@ -2592,8 +2632,7 @@ var yorenov = {
     +         '<div class="xh-sec">\u041f\u0440\u0435\u0434\u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440</div>'
     +         '<div class="xh-stage" id="xh-stage">'
     +           '<div class="xh-grid"></div>'
-    +           '<div class="xh-cross"></div>'
-    +           '<div class="xh-dotp"></div>'
+    +           '<div class="xh-cross" data-xh-shape="full"></div>'
     +         '</div>'
     +         '<div class="xh-stagehint">\u0422\u0430\u043a \u043f\u0440\u0438\u0446\u0435\u043b \u0431\u0443\u0434\u0435\u0442 \u0432\u044b\u0433\u043b\u044f\u0434\u0435\u0442\u044c \u0432 \u0438\u0433\u0440\u0435.<br>'
     +           '\u041f\u0440\u0430\u0432\u044b\u0439 Shift \u2014 \u043e\u0442\u043a\u0440\u044b\u0442\u044c \u00b7 \u0437\u0430\u043a\u0440\u044b\u0442\u044c \u00b7 Esc \u2014 \u0437\u0430\u043a\u0440\u044b\u0442\u044c</div>'
@@ -2605,6 +2644,16 @@ var yorenov = {
     +     '</div>'
     +   '</div>'
     + '</div>';
+
+    // shared crosshair markup: the SAME nodes in game overlay and preview
+    function crossMarkup() {
+        return '<div class="xhc-ring"></div>'
+            + '<div class="xhc-tick xhc-t"></div>'
+            + '<div class="xhc-tick xhc-b"></div>'
+            + '<div class="xhc-tick xhc-l"></div>'
+            + '<div class="xhc-tick xhc-r"></div>'
+            + '<div class="xhc-dot"></div>';
+    }
 
     // ------------------------------------------------------------ helpers
     function miniSvg(shape, color) {
@@ -2622,7 +2671,6 @@ var yorenov = {
         return '<svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">' + body + "</svg>";
     }
 
-    // \u0441\u043b\u0430\u0439\u0434\u0435\u0440 \u043d\u0430 \u0434\u0438\u0432\u0430\u0445 (native range \u0432 cohtml \u043d\u0435 \u043f\u043e\u043b\u0430\u0433\u0430\u0435\u043c\u0441\u044f)
     function addSlider(parent, label, key, min, max, step, fmt) {
         var row = el("div");
         var top = el("div", "xh-rowtop");
@@ -2675,12 +2723,18 @@ var yorenov = {
             if (s === cfg.shape) tiles[s].classList.add("xh-active");
             else tiles[s].classList.remove("xh-active");
         }
-        var sws = panel.querySelectorAll(".xh-sw");
-        for (var i = 0; i < sws.length; i++) {
-            if (sws[i].getAttribute("data-c") === cfg.color) sws[i].classList.add("xh-active");
-            else sws[i].classList.remove("xh-active");
+        for (var t in etabs) {
+            if (t === activeEl) etabs[t].classList.add("xh-active");
+            else etabs[t].classList.remove("xh-active");
         }
-        if (hexInput) hexInput.value = cfg.color;
+        if (panel) {
+            var sws = panel.querySelectorAll(".xh-sw");
+            for (var i = 0; i < sws.length; i++) {
+                if (sws[i].getAttribute("data-c") === cfg[activeEl]) sws[i].classList.add("xh-active");
+                else sws[i].classList.remove("xh-active");
+            }
+        }
+        if (hexInput) hexInput.value = cfg[activeEl];
     }
 
     // ------------------------------------------------------------ build ui
@@ -2690,15 +2744,24 @@ var yorenov = {
         style.textContent = CSS;
         document.head.appendChild(style);
 
+        // --- game overlay: our own crosshair, replaces the game one ---
+        document.documentElement.setAttribute("data-xh-own", "");
+        var game = el("div");
+        game.id = "xh-game";
+        game.innerHTML = '<div class="xh-cross" data-xh-shape="' + cfg.shape + '">' + crossMarkup() + "</div>";
+        document.body.appendChild(game);
+
+        // --- menu ---
         var holder = el("div");
         holder.innerHTML = MENU_HTML;
         root = holder.querySelector("#xh-menu-root");
         panel = root.querySelector("#xh-panel");
         stage = root.querySelector("#xh-stage");
         hexInput = root.querySelector("#xh-hex");
+        stage.querySelector(".xh-cross").innerHTML = crossMarkup();
         document.body.appendChild(root);
 
-        // --- \u043f\u0440\u0435\u0441\u0435\u0442\u044b ---
+        // --- presets ---
         var pwrap = root.querySelector("#xh-presets");
         PRESETS.forEach(function (p) {
             var tile = el("div", "xh-tile");
@@ -2714,45 +2777,56 @@ var yorenov = {
             pwrap.appendChild(tile);
         });
 
-        // --- \u0446\u0432\u0435\u0442\u0430 ---
+        // --- element tabs (which part is being painted) ---
+        var twrap = root.querySelector("#xh-etabs");
+        ETABS.forEach(function (t) {
+            var tab = el("div", "xh-etab");
+            tab.textContent = t.name;
+            tab.addEventListener("click", function () { activeEl = t.key; refreshUi(); });
+            etabs[t.key] = tab;
+            twrap.appendChild(tab);
+        });
+
+        // --- swatches for the active element ---
         var swrap = root.querySelector("#xh-swatches");
         SWATCHES.forEach(function (c) {
             var sw = el("div", "xh-sw");
             sw.style.background = c;
             sw.setAttribute("data-c", c);
-            sw.addEventListener("click", function () { cfg.color = c; applyAll(); saveCfg(); });
+            sw.addEventListener("click", function () { cfg[activeEl] = c; applyAll(); saveCfg(); });
             swrap.appendChild(sw);
         });
 
         hexInput.addEventListener("input", function () {
             var v = hexInput.value.trim();
             if (v.charAt(0) !== "#") v = "#" + v;
-            if (/^#[0-9a-fA-F]{6}$/.test(v)) { cfg.color = v.toUpperCase(); applyAll(); saveCfg(true); }
+            if (/^#[0-9a-fA-F]{6}$/.test(v)) { cfg[activeEl] = v.toUpperCase(); applyAll(); saveCfg(true); }
         });
 
-        // --- \u0441\u043b\u0430\u0439\u0434\u0435\u0440\u044b ---
+        // --- sliders ---
         var slwrap = root.querySelector("#xh-sliders");
-        addSlider(slwrap, "\u0420\u0430\u0437\u043c\u0435\u0440",  "size",    1.0, 8.0, 0.05, fmtPx);
+        addSlider(slwrap, "\u0420\u0430\u0437\u043c\u0435\u0440",   "size",    1.0, 8.0, 0.05, fmtPx);
+        addSlider(slwrap, "\u041a\u043e\u043b\u044c\u0446\u043e",   "ring",    0.0, 0.6, 0.01, fmtPx);
         addSlider(slwrap, "\u041d\u0430\u0441\u0435\u0447\u043a\u0438", "tick",    0.0, 2.0, 0.02, fmtPx);
         addSlider(slwrap, "\u0422\u043e\u043b\u0449\u0438\u043d\u0430", "tickw",   0.0, 1.0, 0.01, fmtPx);
-        addSlider(slwrap, "\u041a\u043e\u043b\u044c\u0446\u043e",   "ring",    0.0, 0.6, 0.01, fmtPx);
+        addSlider(slwrap, "\u041e\u0442\u0441\u0442\u0443\u043f",   "gap",     0.0, 2.0, 0.02, fmtPx);
         addSlider(slwrap, "\u0422\u043e\u0447\u043a\u0430",        "dot",     0.0, 0.8, 0.01, fmtPx);
         addSlider(slwrap, "\u042f\u0440\u043a\u043e\u0441\u0442\u044c", "opacity", 0.2, 1.0, 0.01, fmtPct);
 
-        // --- \u0441\u0431\u0440\u043e\u0441 ---
+        // --- reset ---
         root.querySelector("#xh-reset").addEventListener("click", function () {
             merge(cfg, DEFAULTS);
             applyAll(); saveCfg();
             if (window.yorenovNotify && yorenovNotify.success) yorenovNotify.success("\u041f\u0440\u0438\u0446\u0435\u043b", "\u0421\u0431\u0440\u043e\u0448\u0435\u043d\u043e \u043f\u043e \u0443\u043c\u043e\u043b\u0447\u0430\u043d\u0438\u044e");
         });
 
-        // --- \u0437\u0430\u043a\u0440\u044b\u0442\u0438\u0435: \u043a\u0440\u0435\u0441\u0442\u0438\u043a \u0438 \u043a\u043b\u0438\u043a \u043f\u043e \u0444\u043e\u043d\u0443 ---
+        // --- close: X and backdrop click ---
         root.addEventListener("mousedown", function (e) {
             var t = e.target;
             if (t && t.getAttribute && (t.getAttribute("data-xh-act") === "close" || t.className === "xh-backdrop")) close();
         });
 
-        // --- \u043f\u0435\u0440\u0435\u0442\u0430\u0441\u043a\u0438\u0432\u0430\u043d\u0438\u0435 \u0437\u0430 \u0448\u0430\u043f\u043a\u0443 ---
+        // --- drag by titlebar ---
         var drag = null;
         var titlebar = root.querySelector("#xh-drag");
         titlebar.addEventListener("mousedown", function (e) {
@@ -2778,7 +2852,7 @@ var yorenov = {
 
         window.addEventListener("resize", center);
 
-        // --- \u043a\u043d\u043e\u043f\u043a\u0430-\u0430\u043a\u0442\u0438\u0432\u0430\u0442\u043e\u0440 \u0432 \u0443\u0433\u043b\u0443 ---
+        // --- activator chip ---
         chip = el("div"); chip.id = "xh-chip";
         chip.textContent = "+";
         chip.title = "\u041f\u0440\u0430\u0432\u044b\u0439 Shift \u2014 \u043c\u0435\u043d\u044e \u043f\u0440\u0438\u0446\u0435\u043b\u0430";
@@ -2809,8 +2883,8 @@ var yorenov = {
     }
 
     // ------------------------------------------------------------ keys
-    // \u041f\u0440\u0430\u0432\u044b\u0439 Shift (\u043e\u0441\u043d\u043e\u0432\u043d\u0430\u044f) \u00b7 F9/F10 (\u0437\u0430\u043f\u0430\u0441\u043d\u044b\u0435) \u00b7 Esc \u2014 \u0437\u0430\u043a\u0440\u044b\u0442\u044c.
-    // \u041f\u0440\u0430\u0432\u044b\u0439 Shift: code === "ShiftRight" \u0438\u043b\u0438 location === 2 (RIGHT).
+    // Right Shift (main) / F9, F10 (spare) / Esc - close.
+    // Right Shift: code === "ShiftRight" or location === 2 (RIGHT).
     function isToggleKey(e) {
         if (e.keyCode === 120 || e.keyCode === 121) return true; // F9 / F10
         if (e.keyCode === 16) {                                   // Shift
@@ -2835,7 +2909,7 @@ var yorenov = {
             }
             return;
         }
-        if (!isToggleKey(e)) return;                              // \u043b\u0435\u0432\u044b\u0439 Shift \u0438\u0433\u043d\u043e\u0440\u0438\u0440\u0443\u0435\u043c
+        if (!isToggleKey(e)) return;                              // left Shift ignored
         lastCode = code; lastTick = t;
         e.preventDefault(); e.stopPropagation();
         console.log("[xh-menu] key " + code + " -> toggle");
@@ -2843,7 +2917,7 @@ var yorenov = {
     }
     window.addEventListener("keydown", onKey, true);
 
-    // /crosshair \u0432 \u0447\u0430\u0442\u0435 \u2014 \u0442\u043e\u0436\u0435 \u043e\u0442\u043a\u0440\u044b\u0442\u044c (\u0435\u0441\u043b\u0438 \u0445\u0443\u043a sendChatInput \u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442)
+    // /crosshair in chat - also opens (if the sendChatInput hook works)
     try {
         if (window.yorenov && typeof yorenov.registerCommand === "function")
             yorenov.registerCommand("crosshair", function () { open(); return 0; });
@@ -2854,8 +2928,8 @@ var yorenov = {
         if (!document.body) { setTimeout(boot, 250); return; }
         try {
             build();
-            loadCfg(function () { applyAll(); });   // \u043f\u0440\u0438\u043c\u0435\u043d\u0438\u0442\u044c \u0441\u043e\u0445\u0440\u0430\u043d\u0451\u043d\u043d\u043e\u0435 \u0441\u0440\u0430\u0437\u0443
-            console.log("[xh-menu] v" + window.__xhMenu.version + " loaded: Right Shift / F9 / chip / /crosshair");
+            loadCfg(function () { applyAll(); });   // apply saved config right away
+            console.log("[xh-menu] v" + window.__xhMenu.version + " loaded: own overlay + Right Shift / F9 / chip / /crosshair");
             setTimeout(function () {
                 toast("\u041f\u0440\u0438\u0446\u0435\u043b", "\u041c\u0435\u043d\u044e \u0433\u043e\u0442\u043e\u0432\u043e \u00b7 \u043f\u0440\u0430\u0432\u044b\u0439 Shift \u0438\u043b\u0438 \u043a\u043d\u043e\u043f\u043a\u0430 \u00ab+\u00bb \u0441\u0432\u0435\u0440\u0445\u0443 \u0441\u043b\u0435\u0432\u0430");
             }, 3500);
@@ -2871,5 +2945,4 @@ var yorenov = {
     window.__xhMenu.open = open;
     window.__xhMenu.close = close;
     window.__xhMenu.toggle = toggle;
-    window.__xhMenu.api = function () { return window.SampCrosshair; };
 })();
