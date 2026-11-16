@@ -2132,6 +2132,20 @@ var yorenov = {
     }
 })();
 
+
+// ===========================================================================
+// ScriptLoader \u00b7 Crosshair Menu v2.0  (F9 / F10 \u00b7 \u043a\u043d\u043e\u043f\u043a\u0430 \u0432 \u0443\u0433\u043b\u0443 \u00b7 /crosshair)
+// ---------------------------------------------------------------------------
+// \u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430 \u043f\u0440\u0438\u0446\u0435\u043b\u0430 \u0438\u0437 SampCrosshair (\u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0439 \u043c\u043e\u0434\u0443\u043b\u044c \u044d\u0442\u043e\u0433\u043e \u0444\u0430\u0439\u043b\u0430):
+//   - 5 \u043f\u0440\u0435\u0441\u0435\u0442\u043e\u0432: \u041f\u043e\u043b\u043d\u044b\u0439 / \u041a\u0440\u0435\u0441\u0442 / \u0422\u043e\u0447\u043a\u0430 / \u041a\u0440\u0443\u0433 / \u0422-\u0444\u043e\u0440\u043c\u0430
+//   - \u0446\u0432\u0435\u0442, \u0440\u0430\u0437\u043c\u0435\u0440, \u043d\u0430\u0441\u0435\u0447\u043a\u0438, \u043a\u043e\u043b\u044c\u0446\u043e, \u0442\u043e\u0447\u043a\u0430, \u044f\u0440\u043a\u043e\u0441\u0442\u044c
+//   - \u0436\u0438\u0432\u043e\u0439 \u043f\u0440\u0435\u0434\u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440 \u0432 \u043c\u0435\u043d\u044e
+//   - \u0430\u0432\u0442\u043e\u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0432 JSON: Scriptloader-crosshair.json (\u0447\u0435\u0440\u0435\u0437 config-\u0441\u0435\u0440\u0432\u0435\u0440
+//     \u043b\u043e\u0430\u0434\u0435\u0440\u0430, \u0442\u043e\u0442 \u0436\u0435 \u043c\u0435\u0445\u0430\u043d\u0438\u0437\u043c, \u0447\u0442\u043e \u0443 /radar \u0438 /capture; fallback \u2014 localStorage)
+//   - \u0448\u0440\u0438\u0444\u0442\u044b GothamPro \u2014 \u0442\u0435 \u0436\u0435, \u0447\u0442\u043e \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442 \u0432\u0435\u0441\u044c HUD
+//   - \u0412\u0421\u0415 \u0441\u0442\u0440\u043e\u043a\u0438 \u0432 \u-\u044d\u043a\u0440\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0438: \u0444\u0430\u0439\u043b \u0447\u0438\u0441\u0442\u044b\u0439 ASCII, \u043d\u0438\u043a\u0430\u043a\u0430\u044f \u043a\u043e\u0434\u0438\u0440\u043e\u0432\u043a\u0430
+//     \u043f\u0440\u0438 \u043f\u0443\u0431\u043b\u0438\u043a\u0430\u0446\u0438\u0438 \u043d\u0435 \u0441\u043b\u043e\u043c\u0430\u0435\u0442 \u043d\u0438 \u043a\u043e\u0434, \u043d\u0438 \u0442\u0435\u043a\u0441\u0442 \u0438\u043d\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430
+// ===========================================================================
 (function () {
     'use strict';
     if (window.__xhMenu) return;
@@ -2141,28 +2155,28 @@ var yorenov = {
         shape: "full",      // full | cross | dot | circle | t
         color: "#FFFFFF",
         size: 3.15,         // vh
-        ring: 0.04,         // vh — толщина кольца
-        tick: 0.68,         // vh — длина насечек
-        tickw: 0.295,       // vh — толщина насечек
-        dot: 0.21,          // vh — размер точки
+        ring: 0.04,         // vh \u2014 \u0442\u043e\u043b\u0449\u0438\u043d\u0430 \u043a\u043e\u043b\u044c\u0446\u0430
+        tick: 0.68,         // vh \u2014 \u0434\u043b\u0438\u043d\u0430 \u043d\u0430\u0441\u0435\u0447\u0435\u043a
+        tickw: 0.295,       // vh \u2014 \u0442\u043e\u043b\u0449\u0438\u043d\u0430 \u043d\u0430\u0441\u0435\u0447\u0435\u043a
+        dot: 0.21,          // vh \u2014 \u0440\u0430\u0437\u043c\u0435\u0440 \u0442\u043e\u0447\u043a\u0438
         opacity: 1.0
     };
     var PRESETS = [
-        { key: "full",   name: "Полный",  color: "#FFFFFF",
+        { key: "full",   name: "\u041f\u043e\u043b\u043d\u044b\u0439",  color: "#FFFFFF",
           cfg: { shape: "full",   color: "#FFFFFF", size: 3.15, ring: 0.04, tick: 0.68, tickw: 0.295, dot: 0.21,  opacity: 1 } },
-        { key: "cross",  name: "Крест",   color: "#4CAF50",
+        { key: "cross",  name: "\u041a\u0440\u0435\u0441\u0442",   color: "#4CAF50",
           cfg: { shape: "cross",  color: "#4CAF50", size: 2.40, ring: 0,    tick: 0.90, tickw: 0.26,  dot: 0.20,  opacity: 1 } },
-        { key: "dot",    name: "Точка",   color: "#00E5FF",
+        { key: "dot",    name: "\u0422\u043e\u0447\u043a\u0430",   color: "#00E5FF",
           cfg: { shape: "dot",    color: "#00E5FF", size: 3.15, ring: 0,    tick: 0,    tickw: 0,     dot: 0.34,  opacity: 1 } },
-        { key: "circle", name: "Круг",    color: "#FFD600",
+        { key: "circle", name: "\u041a\u0440\u0443\u0433",    color: "#FFD600",
           cfg: { shape: "circle", color: "#FFD600", size: 3.40, ring: 0.07, tick: 0,    tickw: 0,     dot: 0,     opacity: 1 } },
-        { key: "t",      name: "Т-форма", color: "#FF4444",
+        { key: "t",      name: "\u0422-\u0444\u043e\u0440\u043c\u0430", color: "#FF4444",
           cfg: { shape: "t",      color: "#FF4444", size: 2.60, ring: 0,    tick: 0.90, tickw: 0.26,  dot: 0.20,  opacity: 1 } }
     ];
     var SWATCHES = ["#FFFFFF", "#FF4444", "#FF7A00", "#FFD600", "#4CAF50", "#00E5FF", "#9C6AFF", "#FF6EC7"];
 
     var cfg = null;
-    var root = null, panel = null, stage = null;
+    var root = null, panel = null, stage = null, chip = null;
     var sliders = {};   // key -> {set}
     var tiles = {};     // key -> element
     var hexInput = null;
@@ -2173,13 +2187,31 @@ var yorenov = {
     function el(tag, cls) { var e = document.createElement(tag); if (cls) e.className = cls; return e; }
     function px(vh) { return Math.round(vh * window.innerHeight / 100 * 10) / 10; }
     function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
-    function hex(v) { return ("0" + Math.round(clamp(v, 0, 1) * 255).toString(16)).slice(-2); }
 
     function merge(dst, src) {
         for (var k in DEFAULTS) if (Object.prototype.hasOwnProperty.call(DEFAULTS, k)) {
             if (src && src[k] !== undefined && src[k] !== null) dst[k] = src[k];
         }
         return dst;
+    }
+
+    function now() { return (window.performance && performance.now) ? performance.now() : Date.now(); }
+
+    // ------------------------------------------------------- toast
+    function toast(title, msg) {
+        try {
+            if (window.yorenovNotify && yorenovNotify.info) { yorenovNotify.info(title, msg); return; }
+            if (window.yorenovNotify && yorenovNotify.success) { yorenovNotify.success(title, msg); return; }
+        } catch (e) {}
+        try {
+            var t = el("div");
+            t.textContent = title + " \u2014 " + msg;
+            t.style.cssText = "position:absolute;left:50%;top:12%;transform:translateX(-50%);z-index:2147483001;"
+                + "background:rgba(16,19,24,.92);color:#fff;font:12px Arial;padding:10px 16px;border-radius:8px;"
+                + "border:1px solid rgba(255,255,255,.15)";
+            document.body.appendChild(t);
+            setTimeout(function () { if (t.parentNode) t.remove(); }, 4000);
+        } catch (e) {}
     }
 
     // ------------------------------------------------------- save / load
@@ -2196,7 +2228,7 @@ var yorenov = {
                     localStorage.setItem("xh-cfg", json);
                 }
                 if (!silent && window.yorenovNotify && yorenovNotify.success)
-                    yorenovNotify.success("Прицел", "Настройки сохранены");
+                    yorenovNotify.success("\u041f\u0440\u0438\u0446\u0435\u043b", "\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u044b");
             } catch (e) {}
         }, silent ? 400 : 0);
     }
@@ -2225,7 +2257,7 @@ var yorenov = {
     function applyGame() {
         if (!cfg) return;
         var R = document.documentElement;
-        // Inline-стили на <html> перебивают :root{...} из стилей SampCrosshair
+        // Inline-\u0441\u0442\u0438\u043b\u0438 \u043d\u0430 <html> \u043f\u0435\u0440\u0435\u0431\u0438\u0432\u0430\u044e\u0442 :root{...} \u0438\u0437 \u0441\u0442\u0438\u043b\u0435\u0439 SampCrosshair
         R.style.setProperty("--sc-color", cfg.color);
         R.style.setProperty("--sc-op", String(cfg.opacity));
         R.style.setProperty("--sc-base", cfg.size + "vh");
@@ -2253,38 +2285,40 @@ var yorenov = {
 
     // ------------------------------------------------------------ styles
     var CSS = ""
-    // --- шрифты HUD (GothamPro, как во всём худе) ---
+    // --- \u0448\u0440\u0438\u0444\u0442\u044b HUD (GothamPro, \u043a\u0430\u043a \u0432\u043e \u0432\u0441\u0451\u043c \u0445\u0443\u0434\u0435) ---
     + "@font-face{font-family:'GothamPro';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/refs/heads/main/gothampro.ttf') format('truetype');font-weight:400;font-style:normal}"
     + "@font-face{font-family:'GothamPro Medium';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/refs/heads/main/gothampro_medium.ttf') format('truetype');font-weight:500;font-style:normal}"
     + "@font-face{font-family:'GothamPro Bold';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/refs/heads/main/gothampro_bold.ttf') format('truetype');font-weight:700;font-style:normal}"
     + "@font-face{font-family:'GothamPro Black';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/refs/heads/main/gothampro_black.ttf') format('truetype');font-weight:900;font-style:normal}"
 
-    // --- форма прицела в игре (управляет стилями SampCrosshair) ---
-    // cross: без кольца
+    // --- \u0444\u043e\u0440\u043c\u0430 \u043f\u0440\u0438\u0446\u0435\u043b\u0430 \u0432 \u0438\u0433\u0440\u0435 (\u0443\u043f\u0440\u0430\u0432\u043b\u044f\u0435\u0442 \u0441\u0442\u0438\u043b\u044f\u043c\u0438 SampCrosshair) ---
+    // cross: \u0431\u0435\u0437 \u043a\u043e\u043b\u044c\u0446\u0430
     + 'html[data-xh-shape="cross"] .hud-aim-crosshair__crosshair[data-v-bef93661],'
     + 'html[data-xh-shape="cross"] .hud-aim__container[data-v-7f96fa59]{border-width:0!important}'
-    // dot: только точка
+    // dot: \u0442\u043e\u043b\u044c\u043a\u043e \u0442\u043e\u0447\u043a\u0430
     + 'html[data-xh-shape="dot"] .hud-aim-crosshair__crosshair[data-v-bef93661],'
     + 'html[data-xh-shape="dot"] .hud-aim__container[data-v-7f96fa59]{border-width:0!important}'
     + 'html[data-xh-shape="dot"] .hud-aim-crosshair__crosshair[data-v-bef93661]:before,'
     + 'html[data-xh-shape="dot"] .hud-aim-crosshair__crosshair[data-v-bef93661]:after{width:0!important;height:0!important;box-shadow:none!important}'
     + 'html[data-xh-shape="dot"] .hud-aim__arrow[data-v-7f96fa59]{opacity:0!important}'
-    // circle: только кольцо
+    // circle: \u0442\u043e\u043b\u044c\u043a\u043e \u043a\u043e\u043b\u044c\u0446\u043e
     + 'html[data-xh-shape="circle"] .hud-aim-crosshair__crosshair[data-v-bef93661]:before,'
     + 'html[data-xh-shape="circle"] .hud-aim-crosshair__crosshair[data-v-bef93661]:after{width:0!important;height:0!important;box-shadow:none!important}'
     + 'html[data-xh-shape="circle"] .hud-aim__arrow[data-v-7f96fa59]{opacity:0!important}'
     + 'html[data-xh-shape="circle"] .hud-aim-crosshair__crosshair-wrapper[data-v-bef93661]:after,'
     + 'html[data-xh-shape="circle"] .hud-aim.sc-host[data-v-7f96fa59]:after{width:0!important;height:0!important}'
-    // t: верхняя насечка убрана (нижняя остаётся)
+    // t: \u0432\u0435\u0440\u0445\u043d\u044f\u044f \u043d\u0430\u0441\u0435\u0447\u043a\u0430 \u0443\u0431\u0440\u0430\u043d\u0430 (\u043d\u0438\u0436\u043d\u044f\u044f \u043e\u0441\u0442\u0430\u0451\u0442\u0441\u044f)
     + 'html[data-xh-shape="t"] .hud-aim-crosshair__crosshair[data-v-bef93661]:before{top:calc(100% + var(--sc-ring,0px)/2)!important;box-shadow:none!important}'
     + 'html[data-xh-shape="t"] .hud-aim__arrow[data-v-7f96fa59]:nth-child(2){opacity:0!important}'
 
-    // --- окно меню ---
-    + "#xh-menu-root{position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147483000;display:none;font-family:'GothamPro','GothamPro Medium',Arial,sans-serif}"
+    // --- \u043e\u043a\u043d\u043e \u043c\u0435\u043d\u044e (absolute \u0432\u043c\u0435\u0441\u0442\u043e fixed \u2014 \u043a\u0430\u043a \u043e\u0431\u043e\u0440\u0430\u0447\u0438\u0432\u0430\u044e\u0442\u0441\u044f \u0442\u043e\u0441\u0442\u044b \u0432 \u0445\u0443\u0434\u0435) ---
+    + "#xh-menu-root{position:absolute;left:0;top:0;width:100%;height:100%;z-index:2147483000;display:none;"
+    + "font-family:'GothamPro','GothamPro Medium',Arial,sans-serif}"
     + "#xh-menu-root.xh-open{display:block}"
-    + "#xh-menu-root .xh-backdrop{position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(4,6,10,.45)}"
+    + "#xh-menu-root .xh-backdrop{position:absolute;left:0;top:0;width:100%;height:100%;background:rgba(4,6,10,.45)}"
     + "#xh-panel{--xh-accent:#fff;position:absolute;width:660px;color:#e8ecf3;background:#101318;"
-    + "border:1px solid rgba(255,255,255,.09);border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.55);}"
+    + "border:1px solid rgba(255,255,255,.09);border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.55);"
+    + "-webkit-user-select:none;user-select:none}"
     + "#xh-menu-root.xh-open #xh-panel{animation:xhIn .16s cubic-bezier(.2,.9,.3,1)}"
     + "@keyframes xhIn{from{opacity:0;margin-top:10px}to{opacity:1;margin-top:0}}"
     + ".xh-titlebar{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.07)}"
@@ -2301,7 +2335,7 @@ var yorenov = {
     + ".xh-sec{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:#8a93a6;margin:0 0 9px}"
     + ".xh-sec:not(:first-child){margin-top:16px}"
 
-    // пресеты
+    // \u043f\u0440\u0435\u0441\u0435\u0442\u044b
     + ".xh-presets{display:flex;gap:8px}"
     + ".xh-tile{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;"
     + "padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;color:#fff}"
@@ -2311,7 +2345,7 @@ var yorenov = {
     + ".xh-tile .xh-tname{font-size:9px;color:#aab2c0;letter-spacing:.4px}"
     + ".xh-tile.xh-active .xh-tname{color:#fff}"
 
-    // цвета
+    // \u0446\u0432\u0435\u0442\u0430
     + ".xh-swatches{display:flex;gap:7px;align-items:center}"
     + ".xh-sw{width:22px;height:22px;border-radius:6px;border:1px solid rgba(255,255,255,.18);cursor:pointer}"
     + ".xh-sw.xh-active{box-shadow:0 0 0 2px #101318,0 0 0 4px var(--xh-accent)}"
@@ -2320,7 +2354,7 @@ var yorenov = {
     + "color:#e8ecf3;font-family:'GothamPro Medium',Arial;font-size:12px;padding:6px 9px;outline:none;letter-spacing:.5px}"
     + ".xh-hex:focus{border-color:rgba(255,255,255,.3)}"
 
-    // слайдеры
+    // \u0441\u043b\u0430\u0439\u0434\u0435\u0440\u044b
     + ".xh-rowtop{display:flex;justify-content:space-between;align-items:baseline;margin:11px 0 6px}"
     + ".xh-lab{font-size:11.5px;color:#c7ceda;letter-spacing:.3px}"
     + ".xh-val{font-family:'GothamPro Bold',Arial;font-size:11px;color:var(--xh-accent)}"
@@ -2331,10 +2365,10 @@ var yorenov = {
     + "border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.5)}"
     + ".xh-slider:hover .xh-thumb{box-shadow:0 0 0 4px rgba(255,255,255,.08),0 1px 4px rgba(0,0,0,.5)}"
 
-    // предпросмотр
+    // \u043f\u0440\u0435\u0434\u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440
     + ".xh-stage{position:relative;height:216px;border-radius:10px;border:1px solid rgba(255,255,255,.07);"
     + "background:radial-gradient(120% 90% at 50% 12%,#1b2130 0%,#0b0e14 72%);overflow:hidden}"
-    + ".xh-stage .xh-grid{position:absolute;left:0;top:0;right:0;bottom:0;"
+    + ".xh-stage .xh-grid{position:absolute;left:0;top:0;width:100%;height:100%;"
     + "background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);"
     + "background-size:27px 27px}"
     + ".xh-cross{position:absolute;left:50%;top:50%;width:var(--p-size);height:var(--p-size);"
@@ -2354,12 +2388,19 @@ var yorenov = {
     + '.xh-stage[data-xh-shape="t"] .xh-cross:before{top:calc(100% + var(--p-ring) / 2);box-shadow:none}'
     + ".xh-stagehint{font-size:10px;color:#6b7386;margin-top:8px;line-height:1.6;letter-spacing:.3px}"
 
-    // низ
+    // \u043d\u0438\u0437
     + ".xh-footer{display:flex;align-items:center;gap:10px;padding:12px 20px 16px;border-top:1px solid rgba(255,255,255,.07)}"
     + ".xh-btn{font-family:'GothamPro Bold',Arial;font-size:11px;letter-spacing:1px;color:#e8ecf3;"
     + "background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px 16px;cursor:pointer}"
     + ".xh-btn:hover{background:rgba(255,255,255,.12)}"
-    + ".xh-note{font-size:10px;color:#6b7386;letter-spacing:.3px;margin-left:auto}";
+    + ".xh-note{font-size:10px;color:#6b7386;letter-spacing:.3px;margin-left:auto}"
+
+    // \u043a\u043d\u043e\u043f\u043a\u0430-\u0430\u043a\u0442\u0438\u0432\u0430\u0442\u043e\u0440 \u0432 \u0443\u0433\u043b\u0443
+    + "#xh-chip{position:absolute;left:16px;top:16px;width:24px;height:24px;border-radius:50%;"
+    + "background:rgba(16,19,24,.6);border:1px solid rgba(255,255,255,.16);color:#cfd6e4;"
+    + "display:flex;align-items:center;justify-content:center;font:14px/1 Arial;cursor:pointer;"
+    + "z-index:2147482999;opacity:.28;pointer-events:auto;-webkit-user-select:none;user-select:none}"
+    + "#xh-chip:hover{opacity:1}";
 
     // ------------------------------------------------------------ helpers
     function miniSvg(shape, color) {
@@ -2377,7 +2418,7 @@ var yorenov = {
         return '<svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">' + body + "</svg>";
     }
 
-    // слайдер на дивах (native range в cohtml не полагаемся)
+    // \u0441\u043b\u0430\u0439\u0434\u0435\u0440 \u043d\u0430 \u0434\u0438\u0432\u0430\u0445 (native range \u0432 cohtml \u043d\u0435 \u043f\u043e\u043b\u0430\u0433\u0430\u0435\u043c\u0441\u044f)
     function addSlider(parent, label, key, min, max, step, fmt) {
         var row = el("div");
         var top = el("div", "xh-rowtop");
@@ -2456,10 +2497,10 @@ var yorenov = {
         // --- titlebar ---
         var tb = el("div", "xh-titlebar");
         var dot = el("div", "xh-dot");
-        var title = el("div", "xh-title"); title.textContent = "ПРИЦЕЛ";
-        var sub = el("div", "xh-subtitle"); sub.textContent = "ScriptLoader · настройка прицела";
+        var title = el("div", "xh-title"); title.textContent = "\u041f\u0420\u0418\u0426\u0415\u041b";
+        var sub = el("div", "xh-subtitle"); sub.textContent = "ScriptLoader \u00b7 \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430 \u043f\u0440\u0438\u0446\u0435\u043b\u0430";
         var key = el("div", "xh-key"); key.textContent = "F9";
-        var closeBtn = el("div", "xh-close"); closeBtn.textContent = "✕";
+        var closeBtn = el("div", "xh-close"); closeBtn.textContent = "\u2715";
         closeBtn.addEventListener("mousedown", function (e) { e.stopPropagation(); });
         closeBtn.addEventListener("click", close);
         tb.appendChild(dot); tb.appendChild(title); tb.appendChild(sub); tb.appendChild(key); tb.appendChild(closeBtn);
@@ -2469,8 +2510,8 @@ var yorenov = {
         var left = el("div", "xh-left");
         var right = el("div", "xh-right");
 
-        // --- пресеты ---
-        var sec1 = el("div", "xh-sec"); sec1.textContent = "Форма";
+        // --- \u043f\u0440\u0435\u0441\u0435\u0442\u044b ---
+        var sec1 = el("div", "xh-sec"); sec1.textContent = "\u0424\u043e\u0440\u043c\u0430";
         var presets = el("div", "xh-presets");
         PRESETS.forEach(function (p) {
             var tile = el("div", "xh-tile");
@@ -2480,15 +2521,15 @@ var yorenov = {
             tile.addEventListener("click", function () {
                 merge(cfg, p.cfg);
                 applyAll(); saveCfg();
-                if (window.yorenovNotify && yorenovNotify.success) yorenovNotify.success("Прицел", p.name);
+                if (window.yorenovNotify && yorenovNotify.success) yorenovNotify.success("\u041f\u0440\u0438\u0446\u0435\u043b", p.name);
             });
             tiles[p.key] = tile;
             presets.appendChild(tile);
         });
         left.appendChild(sec1); left.appendChild(presets);
 
-        // --- цвет ---
-        var sec2 = el("div", "xh-sec"); sec2.textContent = "Цвет";
+        // --- \u0446\u0432\u0435\u0442 ---
+        var sec2 = el("div", "xh-sec"); sec2.textContent = "\u0426\u0432\u0435\u0442";
         var sws = el("div", "xh-swatches");
         SWATCHES.forEach(function (c) {
             var sw = el("div", "xh-sw");
@@ -2511,29 +2552,30 @@ var yorenov = {
             if (/^#[0-9a-fA-F]{6}$/.test(v)) { cfg.color = v.toUpperCase(); applyAll(); saveCfg(true); }
         });
         var hexLab = el("span", "xh-stagehint");
-        hexLab.textContent = "HEX-код, например #FF4444";
+        hexLab.textContent = "HEX-\u043a\u043e\u0434, \u043d\u0430\u043f\u0440\u0438\u043c\u0435\u0440 #FF4444";
         hexwrap.appendChild(hexInput); hexwrap.appendChild(hexLab);
         left.appendChild(hexwrap);
 
-        // --- слайдеры ---
-        var sec3 = el("div", "xh-sec"); sec3.textContent = "Размер и толщина";
+        // --- \u0441\u043b\u0430\u0439\u0434\u0435\u0440\u044b ---
+        var sec3 = el("div", "xh-sec"); sec3.textContent = "\u0420\u0430\u0437\u043c\u0435\u0440 \u0438 \u0442\u043e\u043b\u0449\u0438\u043d\u0430";
         left.appendChild(sec3);
-        addSlider(left, "Размер",        "size",    1.0, 8.0, 0.05, fmtPx);
-        addSlider(left, "Насечки",       "tick",    0.0, 2.0, 0.02, fmtPx);
-        addSlider(left, "Толщина",       "tickw",   0.0, 1.0, 0.01, fmtPx);
-        addSlider(left, "Кольцо",        "ring",    0.0, 0.6, 0.01, fmtPx);
-        addSlider(left, "Точка",         "dot",     0.0, 0.8, 0.01, fmtPx);
-        addSlider(left, "Яркость",       "opacity", 0.2, 1.0, 0.01, fmtPct);
+        addSlider(left, "\u0420\u0430\u0437\u043c\u0435\u0440",  "size",    1.0, 8.0, 0.05, fmtPx);
+        addSlider(left, "\u041d\u0430\u0441\u0435\u0447\u043a\u0438", "tick",    0.0, 2.0, 0.02, fmtPx);
+        addSlider(left, "\u0422\u043e\u043b\u0449\u0438\u043d\u0430", "tickw",   0.0, 1.0, 0.01, fmtPx);
+        addSlider(left, "\u041a\u043e\u043b\u044c\u0446\u043e",   "ring",    0.0, 0.6, 0.01, fmtPx);
+        addSlider(left, "\u0422\u043e\u0447\u043a\u0430",        "dot",     0.0, 0.8, 0.01, fmtPx);
+        addSlider(left, "\u042f\u0440\u043a\u043e\u0441\u0442\u044c", "opacity", 0.2, 1.0, 0.01, fmtPct);
 
-        // --- предпросмотр ---
-        var sec4 = el("div", "xh-sec"); sec4.textContent = "Предпросмотр";
+        // --- \u043f\u0440\u0435\u0434\u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440 ---
+        var sec4 = el("div", "xh-sec"); sec4.textContent = "\u041f\u0440\u0435\u0434\u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440";
         stage = el("div", "xh-stage");
         var grid = el("div", "xh-grid");
         var cross = el("div", "xh-cross");
         var dotp = el("div", "xh-dotp");
         stage.appendChild(grid); stage.appendChild(cross); stage.appendChild(dotp);
         var hint = el("div", "xh-stagehint");
-        hint.innerHTML = "Так прицел будет выглядеть в игре.<br>F9 / F10 — открыть · закрыть &nbsp;·&nbsp; Esc — закрыть";
+        hint.innerHTML = "\u0422\u0430\u043a \u043f\u0440\u0438\u0446\u0435\u043b \u0431\u0443\u0434\u0435\u0442 \u0432\u044b\u0433\u043b\u044f\u0434\u0435\u0442\u044c \u0432 \u0438\u0433\u0440\u0435.<br>"
+            + "F9 / F10 \u0438\u043b\u0438 /crosshair \u2014 \u043e\u0442\u043a\u0440\u044b\u0442\u044c \u00b7 Esc \u2014 \u0437\u0430\u043a\u0440\u044b\u0442\u044c";
         right.appendChild(sec4); right.appendChild(stage); right.appendChild(hint);
 
         body.appendChild(left); body.appendChild(right);
@@ -2541,20 +2583,27 @@ var yorenov = {
 
         // --- footer ---
         var ft = el("div", "xh-footer");
-        var reset = el("div", "xh-btn"); reset.textContent = "Сбросить";
+        var reset = el("div", "xh-btn"); reset.textContent = "\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c";
         reset.addEventListener("click", function () {
             merge(cfg, DEFAULTS);
             applyAll(); saveCfg();
-            if (window.yorenovNotify && yorenovNotify.success) yorenovNotify.success("Прицел", "Сброшено по умолчанию");
+            if (window.yorenovNotify && yorenovNotify.success) yorenovNotify.success("\u041f\u0440\u0438\u0446\u0435\u043b", "\u0421\u0431\u0440\u043e\u0448\u0435\u043d\u043e \u043f\u043e \u0443\u043c\u043e\u043b\u0447\u0430\u043d\u0438\u044e");
         });
         var note = el("div", "xh-note");
-        note.textContent = "Сохраняется автоматически · " + CFG_FILE;
+        note.textContent = "\u0421\u043e\u0445\u0440\u0430\u043d\u044f\u0435\u0442\u0441\u044f \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u00b7 " + CFG_FILE;
         ft.appendChild(reset); ft.appendChild(note);
         panel.appendChild(ft);
 
         document.body.appendChild(root);
 
-        // перетаскивание за шапку
+        // --- \u043a\u043d\u043e\u043f\u043a\u0430-\u0430\u043a\u0442\u0438\u0432\u0430\u0442\u043e\u0440 \u0432 \u0443\u0433\u043b\u0443 ---
+        chip = el("div"); chip.id = "xh-chip";
+        chip.textContent = "\u2316";
+        chip.title = "F9 / F10 \u2014 \u043c\u0435\u043d\u044e \u043f\u0440\u0438\u0446\u0435\u043b\u0430";
+        chip.addEventListener("click", function (e) { e.stopPropagation(); toggle(); });
+        document.body.appendChild(chip);
+
+        // \u043f\u0435\u0440\u0435\u0442\u0430\u0441\u043a\u0438\u0432\u0430\u043d\u0438\u0435 \u0437\u0430 \u0448\u0430\u043f\u043a\u0443
         var drag = null;
         tb.addEventListener("mousedown", function (e) {
             if (e.target === closeBtn) return;
@@ -2602,20 +2651,32 @@ var yorenov = {
     }
 
     // ------------------------------------------------------------ keys
-    document.addEventListener("keydown", function (e) {
+    // F9=120, F10=121. \u0421\u043b\u0443\u0448\u0430\u0435\u043c keydown+keyup \u043d\u0430 window (capture) \u0441 \u0437\u0430\u0449\u0438\u0442\u043e\u0439
+    // \u043e\u0442 \u0434\u0443\u0431\u043b\u0435\u0439: \u0435\u0441\u043b\u0438 \u0434\u0432\u0438\u0436\u043e\u043a \u043e\u0442\u0434\u0430\u0451\u0442 \u0442\u043e\u043b\u044c\u043a\u043e keyup \u2014 \u0442\u043e\u0436\u0435 \u0441\u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442.
+    var lastCode = 0, lastTick = 0;
+    function onKey(e) {
+        var code = e.keyCode;
+        if (code !== 120 && code !== 121 && code !== 27) return;
         if (e.repeat) return;
-        if (e.keyCode === 120 || e.keyCode === 121) {   // F9 / F10
-            e.preventDefault();
-            e.stopPropagation();
-            toggle();
-        } else if (e.keyCode === 27 && root && root.classList.contains("xh-open")) { // Esc
-            e.preventDefault();
-            e.stopPropagation();
-            close();
+        var t = now();
+        if (code === lastCode && t - lastTick < 250) return;
+        if (code === 27) {
+            if (root && root.classList.contains("xh-open")) {
+                lastCode = code; lastTick = t;
+                e.preventDefault(); e.stopPropagation();
+                close();
+            }
+            return;
         }
-    }, true);
+        lastCode = code; lastTick = t;
+        e.preventDefault(); e.stopPropagation();
+        console.log("[xh-menu] key " + code + " -> toggle");
+        toggle();
+    }
+    window.addEventListener("keydown", onKey, true);
+    window.addEventListener("keyup", onKey, true);
 
-    // /crosshair в чате — тоже открыть
+    // /crosshair \u0432 \u0447\u0430\u0442\u0435 \u2014 \u0442\u043e\u0436\u0435 \u043e\u0442\u043a\u0440\u044b\u0442\u044c
     try {
         if (window.yorenov && typeof yorenov.registerCommand === "function")
             yorenov.registerCommand("crosshair", function () { open(); return 0; });
@@ -2628,10 +2689,19 @@ var yorenov = {
             open: open, close: close, toggle: toggle,
             api: function () { return window.SampCrosshair; }
         };
-        build();
-        loadCfg(function () { applyAll(); });   // применить сохранённое сразу
+        try {
+            build();
+            loadCfg(function () { applyAll(); });   // \u043f\u0440\u0438\u043c\u0435\u043d\u0438\u0442\u044c \u0441\u043e\u0445\u0440\u0430\u043d\u0451\u043d\u043d\u043e\u0435 \u0441\u0440\u0430\u0437\u0443
+            console.log("[xh-menu] loaded, press F9 / F10 or /crosshair");
+            setTimeout(function () {
+                toast("\u041f\u0440\u0438\u0446\u0435\u043b", "\u041c\u0435\u043d\u044e \u0433\u043e\u0442\u043e\u0432\u043e \u00b7 F9 / F10 \u0438\u043b\u0438 /crosshair");
+            }, 3500);
+        } catch (e) {
+            try { console.error("[xh-menu] boot error:", e); } catch (e2) {}
+        }
     }
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
     else boot();
 })();
+
