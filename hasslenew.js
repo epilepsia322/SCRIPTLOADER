@@ -2131,138 +2131,507 @@ var yorenov = {
         console.error('[yorenov] BlackSpeedometer error:', e);
     }
 })();
+
 (function () {
-  "use strict";
-  var W = window, D = document, ROOT = D.documentElement;
-  if (W.SampCrosshair && W.SampCrosshair.destroy) W.SampCrosshair.destroy();
+    'use strict';
+    if (window.__xhMenu) return;
 
-  var SID = "sc-style";
-  var A = ".hud-aim-crosshair__crosshair[data-v-bef93661]";
-  var B = ".hud-aim__container[data-v-7f96fa59]";
-  var WRAP = ".hud-aim-crosshair__crosshair-wrapper[data-v-bef93661]";
-  var SPREAD = ".hud-aim-crosshair__spread-container[data-v-bef93661]";
-  var SCOPE = ".sniper-aim[data-v-f6508f7b],.hud-aim__sniper[data-v-7f96fa59]";
-  var HIDDEN = ".hud-iface-hidden[data-v-7f96fa59]";
-  var ARROW = ".hud-aim__arrow[data-v-7f96fa59]";
-  var HOST = ".hud-aim.sc-host[data-v-7f96fa59]";
-  var RING = A + "," + B;
-  var OUT = "drop-shadow(var(--sc-ow) 0 0 #000) drop-shadow(calc(var(--sc-ow)*-1) 0 0 #000) drop-shadow(0 var(--sc-ow) 0 #000) drop-shadow(0 calc(var(--sc-ow)*-1) 0 #000)";
+    var CFG_FILE = "Scriptloader-crosshair.json";
+    var DEFAULTS = {
+        shape: "full",      // full | cross | dot | circle | t
+        color: "#FFFFFF",
+        size: 3.15,         // vh
+        ring: 0.04,         // vh — толщина кольца
+        tick: 0.68,         // vh — длина насечек
+        tickw: 0.295,       // vh — толщина насечек
+        dot: 0.21,          // vh — размер точки
+        opacity: 1.0
+    };
+    var PRESETS = [
+        { key: "full",   name: "Полный",  color: "#FFFFFF",
+          cfg: { shape: "full",   color: "#FFFFFF", size: 3.15, ring: 0.04, tick: 0.68, tickw: 0.295, dot: 0.21,  opacity: 1 } },
+        { key: "cross",  name: "Крест",   color: "#4CAF50",
+          cfg: { shape: "cross",  color: "#4CAF50", size: 2.40, ring: 0,    tick: 0.90, tickw: 0.26,  dot: 0.20,  opacity: 1 } },
+        { key: "dot",    name: "Точка",   color: "#00E5FF",
+          cfg: { shape: "dot",    color: "#00E5FF", size: 3.15, ring: 0,    tick: 0,    tickw: 0,     dot: 0.34,  opacity: 1 } },
+        { key: "circle", name: "Круг",    color: "#FFD600",
+          cfg: { shape: "circle", color: "#FFD600", size: 3.40, ring: 0.07, tick: 0,    tickw: 0,     dot: 0,     opacity: 1 } },
+        { key: "t",      name: "Т-форма", color: "#FF4444",
+          cfg: { shape: "t",      color: "#FF4444", size: 2.60, ring: 0,    tick: 0.90, tickw: 0.26,  dot: 0.20,  opacity: 1 } }
+    ];
+    var SWATCHES = ["#FFFFFF", "#FF4444", "#FF7A00", "#FFD600", "#4CAF50", "#00E5FF", "#9C6AFF", "#FF6EC7"];
 
-  var CSS = ""
-    + ":root{--sc-base:3.15vh;--sc-spread:0px;--sc-size:calc(var(--sc-base) + var(--sc-spread));--sc-ring:.04vh;--sc-tick:.68vh;--sc-tw:.295vh;--sc-dot:.21vh;--sc-ow:.09vh;--sc-color:#ffffff;--sc-op:1}"
-    + RING + "{box-sizing:border-box!important;width:var(--sc-size)!important;height:var(--sc-size)!important;min-width:0!important;min-height:0!important;background-color:transparent!important;background-image:none!important;border-style:solid!important;border-width:var(--sc-ring)!important;border-color:var(--sc-color)!important;border-radius:50%!important;opacity:var(--sc-op)!important;overflow:visible!important;filter:" + OUT + "!important}"
-    + A + "{transition:transform .18s ease!important}"
-    + B + "{transition:none!important}"
-    + A + ":before{content:''!important;display:block!important;position:absolute!important;left:50%!important;top:calc(var(--sc-ring)/-2)!important;width:var(--sc-tw)!important;height:var(--sc-tick)!important;background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:0!important;transform:translate(-50%,-50%)!important;box-shadow:0 calc(var(--sc-size) - var(--sc-ring)) 0 var(--sc-color)!important}"
-    + A + ":after{content:''!important;display:block!important;position:absolute!important;top:50%!important;left:calc(var(--sc-ring)/-2)!important;width:var(--sc-tick)!important;height:var(--sc-tw)!important;background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:0!important;transform:translate(-50%,-50%)!important;box-shadow:calc(var(--sc-size) - var(--sc-ring)) 0 0 var(--sc-color)!important}"
-    + WRAP + ":after," + HOST + ":after{content:''!important;display:block!important;position:absolute!important;left:0!important;top:0!important;width:var(--sc-dot)!important;height:var(--sc-dot)!important;margin-left:calc(var(--sc-dot)/-2)!important;margin-top:calc(var(--sc-dot)/-2)!important;background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:50%!important;opacity:var(--sc-op)!important;pointer-events:none!important;filter:" + OUT + "!important}"
-    + HOST + ":after{left:50%!important;top:50%!important}"
-    + SPREAD + "{display:none!important}"
-    + ARROW + "{background-color:var(--sc-color)!important;background-image:none!important;border-width:0!important;border-radius:0!important;opacity:var(--sc-op)!important;filter:none!important}"
-    + ARROW + ":first-child{left:calc(var(--sc-ring)/-2)!important;right:auto!important;top:50%!important;bottom:auto!important;width:var(--sc-tick)!important;height:var(--sc-tw)!important;transform:translateY(-50%)!important}"
-    + ARROW + ":nth-child(3){right:calc(var(--sc-ring)/-2)!important;left:auto!important;top:50%!important;bottom:auto!important;width:var(--sc-tick)!important;height:var(--sc-tw)!important;transform:translateY(-50%)!important}"
-    + ARROW + ":nth-child(2){top:calc(var(--sc-ring)/-2)!important;bottom:auto!important;left:50%!important;right:auto!important;width:var(--sc-tw)!important;height:var(--sc-tick)!important;transform:translateX(-50%)!important}"
-    + ARROW + ":nth-child(4){bottom:calc(var(--sc-ring)/-2)!important;top:auto!important;left:50%!important;right:auto!important;width:var(--sc-tw)!important;height:var(--sc-tick)!important;transform:translateX(-50%)!important}"
-    + "html[data-sc-kill] " + A + ",html[data-sc-kill] " + B + ",html[data-sc-kill] " + WRAP + ":after,html[data-sc-kill] " + HOST + ":after,html[data-sc-kill] " + ARROW + ",.hud-aim-crosshair_kill " + A + ",.hud-aim-crosshair_kill " + WRAP + ":after,.hud-aim-crosshair_kill " + ARROW + "{--sc-color:#f64932!important}"
-    + "html[data-sc-hit] " + A + ",html[data-sc-kill] " + A + ",.hud-aim-crosshair_hit " + A + ",.hud-aim-crosshair_kill " + A + "{animation:sc-pa .24s ease-out!important}"
-    + "html[data-sc-hit] " + B + ",html[data-sc-kill] " + B + "{animation:sc-pb .24s ease-out!important}"
-    + "html[data-sc-off] " + RING + ",html[data-sc-hide] " + RING + ",html[data-sc-off] " + WRAP + ":after,html[data-sc-hide] " + WRAP + ":after,html[data-sc-off] " + HOST + ":after,html[data-sc-hide] " + HOST + ":after,html[data-sc-off] " + ARROW + ",html[data-sc-hide] " + ARROW + "{opacity:0!important}"
-    + "@keyframes sc-pa{0%{transform:translate(-50%,-50%) scale(1)}45%{transform:translate(-50%,-50%) scale(1.3)}100%{transform:translate(-50%,-50%) scale(1)}}"
-    + "@keyframes sc-pb{0%{transform:scale(1)}45%{transform:scale(1.3)}100%{transform:scale(1)}}";
+    var cfg = null;
+    var root = null, panel = null, stage = null;
+    var sliders = {};   // key -> {set}
+    var tiles = {};     // key -> element
+    var hexInput = null;
+    var saveTimer = 0;
+    var dragged = false;
 
-  var st = { off: false, hide: false, spread: 0, t1: 0, t2: 0, raf: 0, obs: null, poll: 0, hooked: null, last: 0, dead: false };
+    // ---------------------------------------------------------------- utils
+    function el(tag, cls) { var e = document.createElement(tag); if (cls) e.className = cls; return e; }
+    function px(vh) { return Math.round(vh * window.innerHeight / 100 * 10) / 10; }
+    function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+    function hex(v) { return ("0" + Math.round(clamp(v, 0, 1) * 255).toString(16)).slice(-2); }
 
-  function q(s) { try { return D.querySelector(s); } catch (e) { return null; } }
-  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
-  function vh(v) { return v * W.innerHeight / 100; }
-  function flag(n, on) { if (on) ROOT.setAttribute(n, ""); else ROOT.removeAttribute(n); }
-
-  function clearFlash() {
-    clearTimeout(st.t1); clearTimeout(st.t2);
-    ROOT.removeAttribute("data-sc-hit"); ROOT.removeAttribute("data-sc-kill");
-  }
-  function flash(kind) {
-    var k = kind === "kill";
-    clearFlash();
-    void ROOT.offsetWidth;
-    flag(k ? "data-sc-kill" : "data-sc-hit", true);
-    var t = setTimeout(clearFlash, k ? 400 : 230);
-    if (k) st.t2 = t; else st.t1 = t;
-  }
-  function onHit(k) { flash(k ? "kill" : "hit"); }
-
-  function hook() {
-    if (st.hooked) return;
-    var e = W.engine;
-    if (!e || typeof e.on !== "function") return;
-    try { e.on("HitDamage", onHit); st.hooked = e; } catch (err) {}
-  }
-
-  function readSpread() {
-    var extra = 0, el = q(SPREAD);
-    if (el && el.style.width) {
-      var raw = el.style.width, n = parseFloat(raw);
-      if (!isNaN(n)) {
-        var px = raw.indexOf("vh") > -1 ? vh(n) : raw.indexOf("vw") > -1 ? n * W.innerWidth / 100 : n;
-        extra = Math.max(0, px - vh(1.86)) * 0.9;
-      }
-    } else {
-      var box = q(B);
-      if (box && box.style.width) {
-        var w = parseFloat(box.style.width);
-        if (!isNaN(w) && w > 0) extra = Math.max(0, w / 48 - 1) * vh(2.2);
-      }
+    function merge(dst, src) {
+        for (var k in DEFAULTS) if (Object.prototype.hasOwnProperty.call(DEFAULTS, k)) {
+            if (src && src[k] !== undefined && src[k] !== null) dst[k] = src[k];
+        }
+        return dst;
     }
-    extra = clamp(extra, 0, vh(7));
-    if (Math.abs(extra - st.spread) > 0.4) { st.spread = extra; ROOT.style.setProperty("--sc-spread", extra.toFixed(2) + "px"); }
-  }
 
-  function sync() {
-    var off = !!q(SCOPE) || !!q(HIDDEN);
-    if (off !== st.off) { st.off = off; flag("data-sc-off", off); }
-    var box = q(B), host = box ? box.parentElement : null;
-    var marked = D.querySelectorAll(".hud-aim.sc-host");
-    for (var i = 0; i < marked.length; i++) if (marked[i] !== host) marked[i].classList.remove("sc-host");
-    if (host && !host.classList.contains("sc-host")) host.classList.add("sc-host");
-    hook();
-  }
-
-  function tick(ts) {
-    if (st.dead) return;
-    if (ts - st.last > 33) { st.last = ts; readSpread(); }
-    st.raf = W.requestAnimationFrame(tick);
-  }
-
-  var api = {
-    version: "4.0.0",
-    hit: function () { flash("hit"); return api; },
-    kill: function () { flash("kill"); return api; },
-    show: function () { st.hide = false; flag("data-sc-hide", false); return api; },
-    hide: function () { st.hide = true; flag("data-sc-hide", true); return api; },
-    destroy: function () {
-      st.dead = true;
-      W.cancelAnimationFrame(st.raf); clearInterval(st.poll); clearTimeout(st.t1); clearTimeout(st.t2);
-      if (st.obs) try { st.obs.disconnect(); } catch (e) {}
-      if (st.hooked && st.hooked.off) try { st.hooked.off("HitDamage", onHit); } catch (e) {}
-      var s = D.getElementById(SID); if (s) s.remove();
-      var m = D.querySelectorAll(".hud-aim.sc-host");
-      for (var i = 0; i < m.length; i++) m[i].classList.remove("sc-host");
-      ["data-sc-off", "data-sc-hide", "data-sc-hit", "data-sc-kill"].forEach(function (a) { ROOT.removeAttribute(a); });
-      ROOT.style.removeProperty("--sc-spread");
-      try { delete W.SampCrosshair; } catch (e) { W.SampCrosshair = undefined; }
+    // ------------------------------------------------------- save / load
+    function saveCfg(silent) {
+        if (!cfg) return;
+        if (saveTimer) clearTimeout(saveTimer);
+        saveTimer = setTimeout(function () {
+            saveTimer = 0;
+            try {
+                var json = JSON.stringify(cfg);
+                if (window.yorenov && yorenov.socket && typeof yorenov.socket.saveConfig === "function") {
+                    yorenov.socket.saveConfig(CFG_FILE, json);
+                } else {
+                    localStorage.setItem("xh-cfg", json);
+                }
+                if (!silent && window.yorenovNotify && yorenovNotify.success)
+                    yorenovNotify.success("Прицел", "Настройки сохранены");
+            } catch (e) {}
+        }, silent ? 400 : 0);
     }
-  };
 
-  var old = D.getElementById(SID); if (old) old.remove();
-  var style = D.createElement("style");
-  style.id = SID; style.textContent = CSS;
-  (D.head || ROOT).appendChild(style);
-  sync();
+    function loadCfg(then) {
+        var apply = function (data) {
+            cfg = merge({}, DEFAULTS);
+            if (data) { try { merge(cfg, JSON.parse(data)); } catch (e) {} }
+            if (then) then();
+        };
+        try {
+            if (window.yorenov && yorenov.socket && typeof yorenov.socket.loadConfig === "function") {
+                yorenov.socket.loadConfig(CFG_FILE, function (data) {
+                    if (data && data !== "null" && data !== "undefined" && data !== "") apply(data);
+                    else {
+                        try { apply(localStorage.getItem("xh-cfg")); } catch (e) { apply(null); }
+                    }
+                });
+                return;
+            }
+            apply(localStorage.getItem("xh-cfg"));
+        } catch (e) { apply(null); }
+    }
 
-  st.obs = new MutationObserver(function () { sync(); });
-  st.obs.observe(D.body || ROOT, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
-  st.poll = setInterval(function () { if (!st.hooked) hook(); }, 700);
-  st.raf = W.requestAnimationFrame(tick);
+    // ------------------------------------------------------- apply to game
+    function applyGame() {
+        if (!cfg) return;
+        var R = document.documentElement;
+        // Inline-стили на <html> перебивают :root{...} из стилей SampCrosshair
+        R.style.setProperty("--sc-color", cfg.color);
+        R.style.setProperty("--sc-op", String(cfg.opacity));
+        R.style.setProperty("--sc-base", cfg.size + "vh");
+        R.style.setProperty("--sc-ring", cfg.ring + "vh");
+        R.style.setProperty("--sc-tick", cfg.tick + "vh");
+        R.style.setProperty("--sc-tw", cfg.tickw + "vh");
+        R.style.setProperty("--sc-dot", cfg.dot + "vh");
+        R.setAttribute("data-xh-shape", cfg.shape);
+    }
 
-  W.SampCrosshair = api;
+    function applyPreview() {
+        if (!stage || !cfg) return;
+        stage.setAttribute("data-xh-shape", cfg.shape);
+        stage.style.setProperty("--p-color", cfg.color);
+        stage.style.setProperty("--p-op", String(cfg.opacity));
+        stage.style.setProperty("--p-size", px(cfg.size) + "px");
+        stage.style.setProperty("--p-ring", px(cfg.ring) + "px");
+        stage.style.setProperty("--p-tick", px(cfg.tick) + "px");
+        stage.style.setProperty("--p-tickw", px(cfg.tickw) + "px");
+        stage.style.setProperty("--p-dot", px(cfg.dot) + "px");
+        if (panel) panel.style.setProperty("--xh-accent", cfg.color);
+    }
+
+    function applyAll() { applyGame(); applyPreview(); refreshUi(); }
+
+    // ------------------------------------------------------------ styles
+    var CSS = ""
+    // --- шрифты HUD (GothamPro, как во всём худе) ---
+    + "@font-face{font-family:'GothamPro';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/refs/heads/main/gothampro.ttf') format('truetype');font-weight:400;font-style:normal}"
+    + "@font-face{font-family:'GothamPro Medium';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/refs/heads/main/gothampro_medium.ttf') format('truetype');font-weight:500;font-style:normal}"
+    + "@font-face{font-family:'GothamPro Bold';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/refs/heads/main/gothampro_bold.ttf') format('truetype');font-weight:700;font-style:normal}"
+    + "@font-face{font-family:'GothamPro Black';src:url('https://raw.githubusercontent.com/Fonts-Limit/Fonts/refs/heads/main/gothampro_black.ttf') format('truetype');font-weight:900;font-style:normal}"
+
+    // --- форма прицела в игре (управляет стилями SampCrosshair) ---
+    // cross: без кольца
+    + 'html[data-xh-shape="cross"] .hud-aim-crosshair__crosshair[data-v-bef93661],'
+    + 'html[data-xh-shape="cross"] .hud-aim__container[data-v-7f96fa59]{border-width:0!important}'
+    // dot: только точка
+    + 'html[data-xh-shape="dot"] .hud-aim-crosshair__crosshair[data-v-bef93661],'
+    + 'html[data-xh-shape="dot"] .hud-aim__container[data-v-7f96fa59]{border-width:0!important}'
+    + 'html[data-xh-shape="dot"] .hud-aim-crosshair__crosshair[data-v-bef93661]:before,'
+    + 'html[data-xh-shape="dot"] .hud-aim-crosshair__crosshair[data-v-bef93661]:after{width:0!important;height:0!important;box-shadow:none!important}'
+    + 'html[data-xh-shape="dot"] .hud-aim__arrow[data-v-7f96fa59]{opacity:0!important}'
+    // circle: только кольцо
+    + 'html[data-xh-shape="circle"] .hud-aim-crosshair__crosshair[data-v-bef93661]:before,'
+    + 'html[data-xh-shape="circle"] .hud-aim-crosshair__crosshair[data-v-bef93661]:after{width:0!important;height:0!important;box-shadow:none!important}'
+    + 'html[data-xh-shape="circle"] .hud-aim__arrow[data-v-7f96fa59]{opacity:0!important}'
+    + 'html[data-xh-shape="circle"] .hud-aim-crosshair__crosshair-wrapper[data-v-bef93661]:after,'
+    + 'html[data-xh-shape="circle"] .hud-aim.sc-host[data-v-7f96fa59]:after{width:0!important;height:0!important}'
+    // t: верхняя насечка убрана (нижняя остаётся)
+    + 'html[data-xh-shape="t"] .hud-aim-crosshair__crosshair[data-v-bef93661]:before{top:calc(100% + var(--sc-ring,0px)/2)!important;box-shadow:none!important}'
+    + 'html[data-xh-shape="t"] .hud-aim__arrow[data-v-7f96fa59]:nth-child(2){opacity:0!important}'
+
+    // --- окно меню ---
+    + "#xh-menu-root{position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147483000;display:none;font-family:'GothamPro','GothamPro Medium',Arial,sans-serif}"
+    + "#xh-menu-root.xh-open{display:block}"
+    + "#xh-menu-root .xh-backdrop{position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(4,6,10,.45)}"
+    + "#xh-panel{--xh-accent:#fff;position:absolute;width:660px;color:#e8ecf3;background:#101318;"
+    + "border:1px solid rgba(255,255,255,.09);border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.55);}"
+    + "#xh-menu-root.xh-open #xh-panel{animation:xhIn .16s cubic-bezier(.2,.9,.3,1)}"
+    + "@keyframes xhIn{from{opacity:0;margin-top:10px}to{opacity:1;margin-top:0}}"
+    + ".xh-titlebar{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.07)}"
+    + ".xh-dot{width:8px;height:8px;border-radius:50%;background:var(--xh-accent)}"
+    + ".xh-title{font-family:'GothamPro Bold','GothamPro',Arial;font-size:14px;letter-spacing:2.5px;color:#fff}"
+    + ".xh-subtitle{font-size:11px;color:#8a93a6;letter-spacing:.4px;margin-left:auto}"
+    + ".xh-key{font-family:'GothamPro Bold',Arial;font-size:10px;color:#0b0d10;background:#e8ecf3;border-radius:4px;padding:3px 7px;letter-spacing:1px}"
+    + ".xh-close{width:26px;height:26px;border-radius:6px;background:rgba(255,255,255,.06);color:#8a93a6;"
+    + "display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer}"
+    + ".xh-close:hover{background:rgba(255,255,255,.12);color:#fff}"
+    + ".xh-body{display:flex;gap:20px;padding:18px 20px 14px}"
+    + ".xh-left{width:330px;flex-shrink:0}"
+    + ".xh-right{flex:1;display:flex;flex-direction:column}"
+    + ".xh-sec{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:#8a93a6;margin:0 0 9px}"
+    + ".xh-sec:not(:first-child){margin-top:16px}"
+
+    // пресеты
+    + ".xh-presets{display:flex;gap:8px}"
+    + ".xh-tile{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;"
+    + "padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;color:#fff}"
+    + ".xh-tile:hover{background:rgba(255,255,255,.08)}"
+    + ".xh-tile.xh-active{border-color:var(--xh-accent);background:rgba(255,255,255,.07)}"
+    + ".xh-tile svg{width:30px;height:30px;display:block}"
+    + ".xh-tile .xh-tname{font-size:9px;color:#aab2c0;letter-spacing:.4px}"
+    + ".xh-tile.xh-active .xh-tname{color:#fff}"
+
+    // цвета
+    + ".xh-swatches{display:flex;gap:7px;align-items:center}"
+    + ".xh-sw{width:22px;height:22px;border-radius:6px;border:1px solid rgba(255,255,255,.18);cursor:pointer}"
+    + ".xh-sw.xh-active{box-shadow:0 0 0 2px #101318,0 0 0 4px var(--xh-accent)}"
+    + ".xh-hexwrap{display:flex;gap:7px;margin-top:9px;align-items:center}"
+    + ".xh-hex{width:86px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;"
+    + "color:#e8ecf3;font-family:'GothamPro Medium',Arial;font-size:12px;padding:6px 9px;outline:none;letter-spacing:.5px}"
+    + ".xh-hex:focus{border-color:rgba(255,255,255,.3)}"
+
+    // слайдеры
+    + ".xh-rowtop{display:flex;justify-content:space-between;align-items:baseline;margin:11px 0 6px}"
+    + ".xh-lab{font-size:11.5px;color:#c7ceda;letter-spacing:.3px}"
+    + ".xh-val{font-family:'GothamPro Bold',Arial;font-size:11px;color:var(--xh-accent)}"
+    + ".xh-slider{position:relative;height:16px;cursor:pointer}"
+    + ".xh-slider .xh-track{position:absolute;left:0;right:0;top:50%;height:3px;margin-top:-1.5px;background:rgba(255,255,255,.1);border-radius:2px}"
+    + ".xh-slider .xh-fill{position:absolute;left:0;top:50%;height:3px;margin-top:-1.5px;background:var(--xh-accent);border-radius:2px;opacity:.85}"
+    + ".xh-slider .xh-thumb{position:absolute;top:50%;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;background:#fff;"
+    + "border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.5)}"
+    + ".xh-slider:hover .xh-thumb{box-shadow:0 0 0 4px rgba(255,255,255,.08),0 1px 4px rgba(0,0,0,.5)}"
+
+    // предпросмотр
+    + ".xh-stage{position:relative;height:216px;border-radius:10px;border:1px solid rgba(255,255,255,.07);"
+    + "background:radial-gradient(120% 90% at 50% 12%,#1b2130 0%,#0b0e14 72%);overflow:hidden}"
+    + ".xh-stage .xh-grid{position:absolute;left:0;top:0;right:0;bottom:0;"
+    + "background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);"
+    + "background-size:27px 27px}"
+    + ".xh-cross{position:absolute;left:50%;top:50%;width:var(--p-size);height:var(--p-size);"
+    + "margin-left:calc(var(--p-size) / -2);margin-top:calc(var(--p-size) / -2);border-style:solid;"
+    + "border-width:var(--p-ring);border-color:var(--p-color);border-radius:50%;opacity:var(--p-op);"
+    + "filter:drop-shadow(0 0 2px rgba(0,0,0,.8))}"
+    + ".xh-cross:before{content:'';position:absolute;left:50%;top:calc(var(--p-ring) / -2);width:var(--p-tickw);height:var(--p-tick);"
+    + "background:var(--p-color);transform:translate(-50%,-50%);box-shadow:0 calc(var(--p-size) - var(--p-ring)) 0 var(--p-color)}"
+    + ".xh-cross:after{content:'';position:absolute;top:50%;left:calc(var(--p-ring) / -2);width:var(--p-tick);height:var(--p-tickw);"
+    + "background:var(--p-color);transform:translate(-50%,-50%);box-shadow:calc(var(--p-size) - var(--p-ring)) 0 0 var(--p-color)}"
+    + ".xh-dotp{position:absolute;left:50%;top:50%;width:var(--p-dot);height:var(--p-dot);"
+    + "margin-left:calc(var(--p-dot) / -2);margin-top:calc(var(--p-dot) / -2);"
+    + "background:var(--p-color);border-radius:50%;opacity:var(--p-op);filter:drop-shadow(0 0 2px rgba(0,0,0,.8))}"
+    + '.xh-stage[data-xh-shape="cross"] .xh-cross,.xh-stage[data-xh-shape="dot"] .xh-cross{border-width:0}'
+    + '.xh-stage[data-xh-shape="dot"] .xh-cross:before,.xh-stage[data-xh-shape="dot"] .xh-cross:after,'
+    + '.xh-stage[data-xh-shape="circle"] .xh-cross:before,.xh-stage[data-xh-shape="circle"] .xh-cross:after{width:0;height:0;box-shadow:none}'
+    + '.xh-stage[data-xh-shape="t"] .xh-cross:before{top:calc(100% + var(--p-ring) / 2);box-shadow:none}'
+    + ".xh-stagehint{font-size:10px;color:#6b7386;margin-top:8px;line-height:1.6;letter-spacing:.3px}"
+
+    // низ
+    + ".xh-footer{display:flex;align-items:center;gap:10px;padding:12px 20px 16px;border-top:1px solid rgba(255,255,255,.07)}"
+    + ".xh-btn{font-family:'GothamPro Bold',Arial;font-size:11px;letter-spacing:1px;color:#e8ecf3;"
+    + "background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px 16px;cursor:pointer}"
+    + ".xh-btn:hover{background:rgba(255,255,255,.12)}"
+    + ".xh-note{font-size:10px;color:#6b7386;letter-spacing:.3px;margin-left:auto}";
+
+    // ------------------------------------------------------------ helpers
+    function miniSvg(shape, color) {
+        var c = color || "#fff";
+        var s = 'stroke="' + c + '" stroke-linecap="round"';
+        var ring = '<circle cx="17" cy="17" r="10" fill="none" ' + s + ' stroke-width="1.7"/>';
+        var dot = '<circle cx="17" cy="17" r="1.8" fill="' + c + '"/>';
+        var t = function (x1, y1, x2, y2) { return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" ' + s + ' stroke-width="2.6"/>'; };
+        var body = "";
+        if (shape === "full") body = ring + t(17, 2.5, 17, 7.5) + t(17, 26.5, 17, 31.5) + t(2.5, 17, 7.5, 17) + t(26.5, 17, 31.5, 17) + dot;
+        else if (shape === "cross") body = t(17, 2.5, 17, 12.5) + t(17, 21.5, 17, 31.5) + t(2.5, 17, 12.5, 17) + t(21.5, 17, 31.5, 17) + dot;
+        else if (shape === "dot") body = '<circle cx="17" cy="17" r="3" fill="' + c + '"/>';
+        else if (shape === "circle") body = '<circle cx="17" cy="17" r="10" fill="none" ' + s + ' stroke-width="2"/>';
+        else if (shape === "t") body = t(17, 21.5, 17, 31.5) + t(2.5, 17, 12.5, 17) + t(21.5, 17, 31.5, 17) + dot;
+        return '<svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">' + body + "</svg>";
+    }
+
+    // слайдер на дивах (native range в cohtml не полагаемся)
+    function addSlider(parent, label, key, min, max, step, fmt) {
+        var row = el("div");
+        var top = el("div", "xh-rowtop");
+        var lab = el("span", "xh-lab"); lab.textContent = label;
+        var val = el("span", "xh-val");
+        top.appendChild(lab); top.appendChild(val);
+        var sl = el("div", "xh-slider");
+        var track = el("div", "xh-track");
+        var fill = el("div", "xh-fill");
+        var thumb = el("div", "xh-thumb");
+        sl.appendChild(track); sl.appendChild(fill); sl.appendChild(thumb);
+        row.appendChild(top); row.appendChild(sl);
+        parent.appendChild(row);
+
+        function round(v) { return Math.round(v / step) * step; }
+        function paint() {
+            var v = cfg[key];
+            var p = (v - min) / (max - min);
+            fill.style.width = (p * 100).toFixed(1) + "%";
+            thumb.style.left = (p * 100).toFixed(1) + "%";
+            val.textContent = fmt(v);
+        }
+        function setFromEvent(ev) {
+            var r = sl.getBoundingClientRect();
+            var p = clamp((ev.clientX - r.left) / r.width, 0, 1);
+            cfg[key] = clamp(round(min + p * (max - min)), min, max);
+            applyAll(); saveCfg(true);
+        }
+        sl.addEventListener("mousedown", function (ev) {
+            setFromEvent(ev);
+            var move = function (e2) { setFromEvent(e2); };
+            var up = function () {
+                document.removeEventListener("mousemove", move);
+                document.removeEventListener("mouseup", up);
+            };
+            document.addEventListener("mousemove", move);
+            document.addEventListener("mouseup", up);
+        });
+        sliders[key] = {
+            set: function (v) { cfg[key] = clamp(round(v), min, max); paint(); },
+            paint: paint
+        };
+        paint();
+    }
+
+    function fmtPx(vh) { return px(vh) + " px"; }
+    function fmtPct(v) { return Math.round(v * 100) + " %"; }
+
+    function refreshUi() {
+        for (var k in sliders) sliders[k].paint();
+        for (var s in tiles) {
+            if (s === cfg.shape) tiles[s].classList.add("xh-active");
+            else tiles[s].classList.remove("xh-active");
+        }
+        var sws = panel.querySelectorAll(".xh-sw");
+        for (var i = 0; i < sws.length; i++) {
+            if (sws[i].getAttribute("data-c") === cfg.color) sws[i].classList.add("xh-active");
+            else sws[i].classList.remove("xh-active");
+        }
+        if (hexInput) hexInput.value = cfg.color;
+    }
+
+    // ------------------------------------------------------------ build ui
+    function build() {
+        var style = document.createElement("style");
+        style.id = "xh-menu-styles";
+        style.textContent = CSS;
+        document.head.appendChild(style);
+
+        root = el("div"); root.id = "xh-menu-root";
+        var back = el("div", "xh-backdrop");
+        back.addEventListener("mousedown", close);
+        panel = el("div"); panel.id = "xh-panel";
+        root.appendChild(back); root.appendChild(panel);
+
+        // --- titlebar ---
+        var tb = el("div", "xh-titlebar");
+        var dot = el("div", "xh-dot");
+        var title = el("div", "xh-title"); title.textContent = "ПРИЦЕЛ";
+        var sub = el("div", "xh-subtitle"); sub.textContent = "ScriptLoader · настройка прицела";
+        var key = el("div", "xh-key"); key.textContent = "F9";
+        var closeBtn = el("div", "xh-close"); closeBtn.textContent = "✕";
+        closeBtn.addEventListener("mousedown", function (e) { e.stopPropagation(); });
+        closeBtn.addEventListener("click", close);
+        tb.appendChild(dot); tb.appendChild(title); tb.appendChild(sub); tb.appendChild(key); tb.appendChild(closeBtn);
+        panel.appendChild(tb);
+
+        var body = el("div", "xh-body");
+        var left = el("div", "xh-left");
+        var right = el("div", "xh-right");
+
+        // --- пресеты ---
+        var sec1 = el("div", "xh-sec"); sec1.textContent = "Форма";
+        var presets = el("div", "xh-presets");
+        PRESETS.forEach(function (p) {
+            var tile = el("div", "xh-tile");
+            tile.innerHTML = miniSvg(p.key, "#ffffff");
+            var nm = el("div", "xh-tname"); nm.textContent = p.name;
+            tile.appendChild(nm);
+            tile.addEventListener("click", function () {
+                merge(cfg, p.cfg);
+                applyAll(); saveCfg();
+                if (window.yorenovNotify && yorenovNotify.success) yorenovNotify.success("Прицел", p.name);
+            });
+            tiles[p.key] = tile;
+            presets.appendChild(tile);
+        });
+        left.appendChild(sec1); left.appendChild(presets);
+
+        // --- цвет ---
+        var sec2 = el("div", "xh-sec"); sec2.textContent = "Цвет";
+        var sws = el("div", "xh-swatches");
+        SWATCHES.forEach(function (c) {
+            var sw = el("div", "xh-sw");
+            sw.style.background = c;
+            sw.setAttribute("data-c", c);
+            sw.addEventListener("click", function () { cfg.color = c; applyAll(); saveCfg(); });
+            sws.appendChild(sw);
+        });
+        left.appendChild(sec2); left.appendChild(sws);
+
+        var hexwrap = el("div", "xh-hexwrap");
+        hexInput = document.createElement("input");
+        hexInput.className = "xh-hex";
+        hexInput.setAttribute("type", "text");
+        hexInput.setAttribute("maxlength", "7");
+        hexInput.setAttribute("spellcheck", "false");
+        hexInput.addEventListener("input", function () {
+            var v = hexInput.value.trim();
+            if (v.charAt(0) !== "#") v = "#" + v;
+            if (/^#[0-9a-fA-F]{6}$/.test(v)) { cfg.color = v.toUpperCase(); applyAll(); saveCfg(true); }
+        });
+        var hexLab = el("span", "xh-stagehint");
+        hexLab.textContent = "HEX-код, например #FF4444";
+        hexwrap.appendChild(hexInput); hexwrap.appendChild(hexLab);
+        left.appendChild(hexwrap);
+
+        // --- слайдеры ---
+        var sec3 = el("div", "xh-sec"); sec3.textContent = "Размер и толщина";
+        left.appendChild(sec3);
+        addSlider(left, "Размер",        "size",    1.0, 8.0, 0.05, fmtPx);
+        addSlider(left, "Насечки",       "tick",    0.0, 2.0, 0.02, fmtPx);
+        addSlider(left, "Толщина",       "tickw",   0.0, 1.0, 0.01, fmtPx);
+        addSlider(left, "Кольцо",        "ring",    0.0, 0.6, 0.01, fmtPx);
+        addSlider(left, "Точка",         "dot",     0.0, 0.8, 0.01, fmtPx);
+        addSlider(left, "Яркость",       "opacity", 0.2, 1.0, 0.01, fmtPct);
+
+        // --- предпросмотр ---
+        var sec4 = el("div", "xh-sec"); sec4.textContent = "Предпросмотр";
+        stage = el("div", "xh-stage");
+        var grid = el("div", "xh-grid");
+        var cross = el("div", "xh-cross");
+        var dotp = el("div", "xh-dotp");
+        stage.appendChild(grid); stage.appendChild(cross); stage.appendChild(dotp);
+        var hint = el("div", "xh-stagehint");
+        hint.innerHTML = "Так прицел будет выглядеть в игре.<br>F9 / F10 — открыть · закрыть &nbsp;·&nbsp; Esc — закрыть";
+        right.appendChild(sec4); right.appendChild(stage); right.appendChild(hint);
+
+        body.appendChild(left); body.appendChild(right);
+        panel.appendChild(body);
+
+        // --- footer ---
+        var ft = el("div", "xh-footer");
+        var reset = el("div", "xh-btn"); reset.textContent = "Сбросить";
+        reset.addEventListener("click", function () {
+            merge(cfg, DEFAULTS);
+            applyAll(); saveCfg();
+            if (window.yorenovNotify && yorenovNotify.success) yorenovNotify.success("Прицел", "Сброшено по умолчанию");
+        });
+        var note = el("div", "xh-note");
+        note.textContent = "Сохраняется автоматически · " + CFG_FILE;
+        ft.appendChild(reset); ft.appendChild(note);
+        panel.appendChild(ft);
+
+        document.body.appendChild(root);
+
+        // перетаскивание за шапку
+        var drag = null;
+        tb.addEventListener("mousedown", function (e) {
+            if (e.target === closeBtn) return;
+            var r = panel.getBoundingClientRect();
+            drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+            document.addEventListener("mousemove", onMove);
+            document.addEventListener("mouseup", onUp);
+            e.preventDefault();
+        });
+        function onMove(e) {
+            if (!drag) return;
+            dragged = true;
+            panel.style.left = clamp(e.clientX - drag.dx, 0, window.innerWidth - 80) + "px";
+            panel.style.top = clamp(e.clientY - drag.dy, 0, window.innerHeight - 40) + "px";
+        }
+        function onUp() {
+            drag = null;
+            document.removeEventListener("mousemove", onMove);
+            document.removeEventListener("mouseup", onUp);
+        }
+
+        window.addEventListener("resize", center);
+    }
+
+    function center() {
+        if (!panel) return;
+        if (dragged) return;
+        panel.style.left = Math.max(0, (window.innerWidth - 660) / 2) + "px";
+        panel.style.top = Math.max(0, (window.innerHeight - 560) / 2) + "px";
+    }
+
+    // ------------------------------------------------------------ open/close
+    function open() {
+        if (!root) return;
+        center();
+        root.classList.add("xh-open");
+    }
+    function close() {
+        if (!root) return;
+        root.classList.remove("xh-open");
+    }
+    function toggle() {
+        if (root && root.classList.contains("xh-open")) close();
+        else open();
+    }
+
+    // ------------------------------------------------------------ keys
+    document.addEventListener("keydown", function (e) {
+        if (e.repeat) return;
+        if (e.keyCode === 120 || e.keyCode === 121) {   // F9 / F10
+            e.preventDefault();
+            e.stopPropagation();
+            toggle();
+        } else if (e.keyCode === 27 && root && root.classList.contains("xh-open")) { // Esc
+            e.preventDefault();
+            e.stopPropagation();
+            close();
+        }
+    }, true);
+
+    // /crosshair в чате — тоже открыть
+    try {
+        if (window.yorenov && typeof yorenov.registerCommand === "function")
+            yorenov.registerCommand("crosshair", function () { open(); return 0; });
+    } catch (e) {}
+
+    // ------------------------------------------------------------ boot
+    function boot() {
+        if (!document.body) { setTimeout(boot, 250); return; }
+        window.__xhMenu = {
+            open: open, close: close, toggle: toggle,
+            api: function () { return window.SampCrosshair; }
+        };
+        build();
+        loadCfg(function () { applyAll(); });   // применить сохранённое сразу
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+    else boot();
 })();
