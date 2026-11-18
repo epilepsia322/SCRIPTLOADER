@@ -1173,7 +1173,14 @@ var yorenov = {
             table.appendChild(rightCol);
             customCapture.appendChild(table);
             this.injectBaseStyles();
-            originalCapture.parentNode.insertBefore(customCapture, originalCapture);
+            // Never inject our overlay into the Vue-managed capture container: a foreign
+            // DOM node inside #app breaks Vue's patching when the capture/menu re-renders
+            // (that is what used to kill the HUD after /mn). Keep it on <body> instead.
+            if (document.body) {
+                document.body.appendChild(customCapture);
+            } else {
+                originalCapture.parentNode.insertBefore(customCapture, originalCapture);
+            }
             document.querySelectorAll('.capture').forEach(function(el) {
                 if (el.id !== 'old-capture') el.style.display = 'none';
             });
@@ -1247,8 +1254,17 @@ var yorenov = {
             if (this.data.updateInterval) clearInterval(this.data.updateInterval);
             var self = this;
             this.data.updateInterval = setInterval(function() {
+                var activeCapture = document.querySelector('.capture:not(#old-capture)');
                 var custom = document.getElementById('old-capture');
                 var alive = custom && document.body.contains(custom);
+                if (!activeCapture) {
+                    // Capture is over: drop our overlay so a stale table can never stay
+                    // on top of the HUD. The init() interval re-hooks on the next capture.
+                    if (custom && custom.parentNode) custom.parentNode.removeChild(custom);
+                    self.data.customElement = null;
+                    self.data.isInitialized = false;
+                    return;
+                }
                 if (!alive) {
                     var originalCapture = document.querySelector('.capture');
                     if (originalCapture) {
@@ -1277,7 +1293,7 @@ var yorenov = {
             var style = document.createElement('style');
             style.id = 'capture-styles';
             var css = '';
-            css += '#old-capture {position:absolute;top:0;left:0;width:100%;height:100vh;pointer-events:none;z-index:1000;display:flex;align-items:center;justify-content:center;}';
+            css += '#old-capture {position:fixed;top:0;left:0;width:100%;height:100vh;pointer-events:none;z-index:1000;display:flex;align-items:center;justify-content:center;}';
             css += '#old-capture .capture-table {position:absolute;transform-origin:center top;font-size:100px;}';
             css += '#app .capture-scoreboard {display:none !important;}';
             css += '#app .capture-scoreboard__left-side,#app .capture-scoreboard__timer,#app .capture-scoreboard__timer-bg-wrapper,#app .capture-scoreboard__right-side {display:none !important;}';
@@ -2085,11 +2101,13 @@ var yorenov = {
                 console.log('[HUD] First press');
             } else if (hudHide === 2) {
                 if (hud) {
+                    hud.setAttribute('data-yorenov-manual-hidden', '');
                     hud.style.display = 'none';
                     console.log('[HUD] Hidden');
                 }
             } else if (hudHide === 3) {
                 if (hud) {
+                    hud.removeAttribute('data-yorenov-manual-hidden');
                     hud.style.display = 'block';
                     console.log('[HUD] Visible');
                 }
@@ -2265,4 +2283,105 @@ var yorenov = {
   st.raf = W.requestAnimationFrame(tick);
 
   W.SampCrosshair = api;
+})();
+/*
+ * ==== yorenov HUD stability fixes ====
+ * 1) The game calls openInterface("CaptureResult") right after a capture ends. The
+ *    custom capture table replaces that screen anyway, so the call is swallowed here
+ *    and the result interface is never created.
+ * 2) After /mn (/menu) the game can leave the custom HUD with inline display:none.
+ *    A short watchdog after the command restores it as soon as no interface is open.
+ */
+(function() {
+    'use strict';
+
+    /* ---------- 1. never create CaptureResult ---------- */
+    if (!window.__yorenovCaptureResultSuppressed) {
+        window.__yorenovCaptureResultSuppressed = true;
+
+        var installCaptureResultGuard = function() {
+            if (typeof window.openInterface !== 'function') return false;
+            if (window.openInterface.__yorenovCaptureResultGuard) return true;
+
+            var originalOpenInterface = window.openInterface;
+            var guardedOpenInterface = new Proxy(originalOpenInterface, {
+                apply: function(target, thisArg, args) {
+                    try {
+                        var name = args && args[0];
+                        if (String(name) === 'CaptureResult') {
+                            console.log('[yorenov] CaptureResult blocked');
+                            return 0;
+                        }
+                    } catch (e) {}
+                    return Reflect.apply(target, thisArg, args);
+                }
+            });
+            guardedOpenInterface.__yorenovCaptureResultGuard = true;
+            window.openInterface = guardedOpenInterface;
+            console.log('[yorenov] CaptureResult guard installed');
+            return true;
+        };
+
+        if (!installCaptureResultGuard()) {
+            var captureGuardTimer = setInterval(function() {
+                if (installCaptureResultGuard()) clearInterval(captureGuardTimer);
+            }, 250);
+        }
+    }
+
+    /* ---------- 2. recover the HUD after /mn ---------- */
+    var hudRestoreTimers = [];
+
+    function anyInterfaceOpen() {
+        try {
+            return !!document.querySelector(
+                '.hud-iface-hidden, #app .modal-container-wrapper, #app .modal-overlay, #app .capture-scoreboard'
+            );
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function restoreHudIfNeeded() {
+        var hud = document.querySelector('.OLD-RADMIR-hud');
+        if (!hud) return false;
+        if (hud.hasAttribute('data-yorenov-manual-hidden')) return false;
+        if (anyInterfaceOpen()) return false;
+        if (hud.style.display === 'none') {
+            hud.style.display = '';
+            console.log('[yorenov] HUD restored after interface closed');
+            return true;
+        }
+        return false;
+    }
+
+    function scheduleHudRestore() {
+        hudRestoreTimers.forEach(clearInterval);
+        hudRestoreTimers = [];
+        var tick = 0;
+        var timer = setInterval(function() {
+            tick += 1;
+            if (restoreHudIfNeeded() || tick > 120) {
+                clearInterval(timer);
+            }
+        }, 250);
+        hudRestoreTimers.push(timer);
+    }
+
+    window.yorenovRestoreHud = scheduleHudRestore;
+
+    if (typeof yorenov !== 'undefined' && yorenov && typeof yorenov.registerCommand === 'function') {
+        try {
+            yorenov.registerCommand('/mn', function() {
+                scheduleHudRestore();
+                return 1; // let the game handle /mn normally
+            });
+            yorenov.registerCommand('/menu', function() {
+                scheduleHudRestore();
+                return 1;
+            });
+        } catch (e) {
+            console.error('[yorenov] /mn guard error:', e);
+        }
+    }
 })();
