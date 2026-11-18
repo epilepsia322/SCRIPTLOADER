@@ -2289,8 +2289,10 @@ var yorenov = {
  * 1) The game calls openInterface("CaptureResult") right after a capture ends. The
  *    custom capture table replaces that screen anyway, so the call is swallowed here
  *    and the result interface is never created.
- * 2) After /mn (/menu) the game can leave the custom HUD with inline display:none.
- *    A short watchdog after the command restores it as soon as no interface is open.
+ * 2) After /mn (/menu) the game can close or recreate the Hud interface and leave
+ *    the custom HUD frozen/hidden. A permanent watchdog re-binds the update
+ *    callbacks, reopens the Hud interface if needed and restores the HUD element
+ *    as soon as no interface is open.
  */
 (function() {
     'use strict';
@@ -2308,7 +2310,7 @@ var yorenov = {
                 apply: function(target, thisArg, args) {
                     try {
                         var name = args && args[0];
-                        if (String(name) === 'CaptureResult') {
+                        if (String(name).toLowerCase() === 'captureresult') {
                             console.log('[yorenov] CaptureResult blocked');
                             return 0;
                         }
@@ -2329,55 +2331,268 @@ var yorenov = {
         }
     }
 
-    /* ---------- 2. recover the HUD after /mn ---------- */
-    var hudRestoreTimers = [];
+    /* ---------- 2. keep the custom HUD alive after /mn ---------- */
+    /*
+     * /mn (/menu) can make the game close or recreate the "Hud" interface.
+     * When that happens the old info Proxy is gone, so no more update callbacks
+     * reach the custom HUD, and hideInfo() leaves it with inline display:none.
+     * This watchdog permanently re-binds to the current Hud instance, keeps the
+     * game's info.show flag true while no interface is open (so the client keeps
+     * sending HUD updates), and restores the custom HUD element.
+     */
+    var HUD_INFO_KEYS = [
+        'show', 'showBars', 'health', 'armour', 'hunger', 'breath', 'money',
+        'wanted', 'weapon', 'ammoInClip', 'totalAmmo', 'freeze', 'isShowFreeze'
+    ];
+    var hudLastValues = {};
+    var hudWasSeen = false;
+    var lastHudReopenAt = 0;
+    var hudInfoProxyByTarget = new WeakMap();
+    var currentHudInfoProxy = null;
+    var speedometerRef = null;
+    var speedometerParamsRef = null;
+    var hudInterfaceWasOpen = false;
+
+    function getHudInterface() {
+        try {
+            if (typeof window.interface !== 'function') return null;
+            return window.interface('Hud') || null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function dispatchHudCallbacks(property, value) {
+        try {
+            if ((property === 'show' || property === 'showBars') && +value >= 1) {
+                /* F7 manually hid the HUD - do not override that with show events. */
+                if (document.querySelector('.OLD-RADMIR-hud[data-yorenov-manual-hidden]')) {
+                    return;
+                }
+            }
+            var callbacks = yorenov.addNewInterfaces.data.callBacks;
+            if (!callbacks || !callbacks.length) return;
+            for (var i = 0; i < callbacks.length; i += 1) {
+                try {
+                    callbacks[i](property, value);
+                } catch (e) {}
+            }
+        } catch (e) {}
+    }
+
+    function isElementVisible(el) {
+        if (!el || typeof el.getClientRects !== 'function') return false;
+        if (!el.getClientRects().length) return false;
+        var style = window.getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden';
+    }
 
     function anyInterfaceOpen() {
         try {
-            return !!document.querySelector(
-                '.hud-iface-hidden, #app .modal-container-wrapper, #app .modal-overlay, #app .capture-scoreboard'
-            );
-        } catch (e) {
-            return false;
-        }
-    }
-
-    function restoreHudIfNeeded() {
-        var hud = document.querySelector('.OLD-RADMIR-hud');
-        if (!hud) return false;
-        if (hud.hasAttribute('data-yorenov-manual-hidden')) return false;
-        if (anyInterfaceOpen()) return false;
-        if (hud.style.display === 'none') {
-            hud.style.display = '';
-            console.log('[yorenov] HUD restored after interface closed');
-            return true;
-        }
+            var nodes = document.querySelectorAll('#app .iface-container');
+            for (var i = 0; i < nodes.length; i += 1) {
+                if (isElementVisible(nodes[i])) return true;
+            }
+        } catch (e) {}
         return false;
     }
 
-    function scheduleHudRestore() {
-        hudRestoreTimers.forEach(clearInterval);
-        hudRestoreTimers = [];
-        var tick = 0;
-        var timer = setInterval(function() {
-            tick += 1;
-            if (restoreHudIfNeeded() || tick > 120) {
-                clearInterval(timer);
+    function wrapHudInfo(hud) {
+        var info;
+        try {
+            info = hud.info;
+        } catch (e) {
+            return null;
+        }
+        if (!info) return null;
+        if (info === currentHudInfoProxy) return info;
+
+        var existing = null;
+        try {
+            existing = hudInfoProxyByTarget.get(info);
+        } catch (e) {}
+
+        if (existing) {
+            if (hud.info !== existing) {
+                try {
+                    hud.info = existing;
+                } catch (e) {}
             }
-        }, 250);
-        hudRestoreTimers.push(timer);
+            return existing;
+        }
+
+        try {
+            var proxy = new Proxy(info, {
+                set: function(target, property, value) {
+                    hudLastValues[property] = value;
+                    dispatchHudCallbacks(property, value);
+                    return Reflect.set(target, property, value);
+                }
+            });
+            hudInfoProxyByTarget.set(info, proxy);
+            hudInfoProxyByTarget.set(proxy, proxy);
+            currentHudInfoProxy = proxy;
+            hud.info = proxy;
+            hudLastValues = {};
+            console.log('[yorenov] Hud info re-bound');
+            return proxy;
+        } catch (e) {
+            return info;
+        }
     }
 
-    window.yorenovRestoreHud = scheduleHudRestore;
+    function syncHudInfo(info) {
+        if (!info) return;
+        for (var i = 0; i < HUD_INFO_KEYS.length; i += 1) {
+            var key = HUD_INFO_KEYS[i];
+            var value;
+            try {
+                value = info[key];
+            } catch (e) {
+                continue;
+            }
+            if (value === undefined) continue;
+            if (hudLastValues[key] === value) continue;
+            hudLastValues[key] = value;
+            dispatchHudCallbacks(key, value);
+        }
+    }
+
+    /*
+     * The speedometer updater also stores its callback inside a Proxy. If the game
+     * replaces hud.speedometer (which happens together with a Hud recreation),
+     * keep the original Proxy alive by copying the new state through it.
+     */
+    function maintainSpeedometer(hud) {
+        try {
+            if (!document.querySelector('.yorenov-speedometer')) return;
+            var speedometer = hud.speedometer;
+            if (!speedometer) return;
+
+            if (!speedometerRef) {
+                speedometerRef = speedometer;
+                speedometerParamsRef = speedometer.params;
+                return;
+            }
+
+            if (speedometer !== speedometerRef) {
+                for (var key in speedometer) {
+                    if (Object.prototype.hasOwnProperty.call(speedometer, key)) {
+                        try {
+                            speedometerRef[key] = speedometer[key];
+                        } catch (e) {}
+                    }
+                }
+                try {
+                    hud.speedometer = speedometerRef;
+                } catch (e) {}
+            }
+
+            var current = hud.speedometer;
+            var params = current && current.params;
+            if (speedometerParamsRef && params && params !== speedometerParamsRef) {
+                for (var paramKey in params) {
+                    if (Object.prototype.hasOwnProperty.call(params, paramKey)) {
+                        try {
+                            speedometerParamsRef[paramKey] = params[paramKey];
+                        } catch (e) {}
+                    }
+                }
+                try {
+                    current.params = speedometerParamsRef;
+                } catch (e) {}
+            }
+        } catch (e) {}
+    }
+
+    function maintainHud() {
+        try {
+            if (typeof installCaptureResultGuard === 'function') {
+                installCaptureResultGuard();
+            }
+        } catch (e) {}
+
+        var hud = getHudInterface();
+
+        if (!hud) {
+            /* The game closed the Hud interface after /mn - reopen it. */
+            var now = Date.now();
+            if (hudWasSeen &&
+                document.querySelector('.OLD-RADMIR-hud') &&
+                !anyInterfaceOpen() &&
+                now - lastHudReopenAt > 1500) {
+                lastHudReopenAt = now;
+                try {
+                    if (typeof window.openInterface === 'function') {
+                        window.openInterface('Hud');
+                    }
+                } catch (e) {}
+            }
+            return;
+        }
+
+        hudWasSeen = true;
+        var info = wrapHudInfo(hud);
+        if (!info) return;
+
+        var interfaceOpen = anyInterfaceOpen();
+        if (interfaceOpen) {
+            hudInterfaceWasOpen = true;
+        }
+        if (!interfaceOpen) {
+            if (hudInterfaceWasOpen) {
+                hudInterfaceWasOpen = false;
+                /* Restore radar / voice chat / info after the interface closed. */
+                try {
+                    if (typeof hud.openInfo === 'function') {
+                        hud.openInfo();
+                    }
+                } catch (e) {}
+            }
+
+            /* Make the client believe the HUD is visible so updates continue. */
+            if (!info.show) {
+                try {
+                    hud.info.show = true;
+                } catch (e) {}
+            }
+            if (!info.showBars) {
+                try {
+                    hud.info.showBars = true;
+                } catch (e) {}
+            }
+
+            var hudElement = document.querySelector('.OLD-RADMIR-hud');
+            if (hudElement &&
+                !hudElement.hasAttribute('data-yorenov-manual-hidden') &&
+                hudElement.style.display === 'none') {
+                hudElement.style.display = '';
+                console.log('[yorenov] HUD restored after interface closed');
+            }
+        }
+
+        syncHudInfo(hud.info);
+        maintainSpeedometer(hud);
+    }
+
+    window.yorenovRestoreHud = function() {
+        maintainHud();
+    };
+
+    /* Initial pass + permanent watchdog (cheap, runs 5 times a second). */
+    maintainHud();
+    setInterval(maintainHud, 200);
 
     if (typeof yorenov !== 'undefined' && yorenov && typeof yorenov.registerCommand === 'function') {
         try {
             yorenov.registerCommand('/mn', function() {
-                scheduleHudRestore();
+                setTimeout(maintainHud, 0);
+                setTimeout(maintainHud, 750);
                 return 1; // let the game handle /mn normally
             });
             yorenov.registerCommand('/menu', function() {
-                scheduleHudRestore();
+                setTimeout(maintainHud, 0);
+                setTimeout(maintainHud, 750);
                 return 1;
             });
         } catch (e) {
