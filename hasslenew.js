@@ -1,3 +1,160 @@
+/* ==== Remote log via localhost:3874 -> hasslenew.log ====
+   Все console.log/info/warn/error/debug, ошибки окна и необработанные промисы
+   собираются в буфер и отправляются на локальный сервер ScriptLoader
+   (POST http://localhost:3874/save_config, тело: "hasslenew.log|<текст>").
+   Файл hasslenew.log создаётся/перезаписывается в папке, откуда запущена игра.
+   Ручная запись: window.hassleLog.write("сообщение"); window.hassleLog.flush(); */
+(function () {
+    if (window.__hassleRemoteLogInstalled) return;
+    window.__hassleRemoteLogInstalled = true;
+
+    var LOG_ENDPOINT = "http://localhost:3874/save_config";
+    var LOG_FILENAME = "hasslenew.log";
+    var LOG_MAX_CHARS = 200000;
+    var LOG_FLUSH_MS = 1000;
+
+    var buffer = [];
+    var bufferedChars = 0;
+    var dirty = false;
+    var sending = false;
+    var sessionStart = new Date();
+
+    function pad(value, length) {
+        var s = String(value);
+        while (s.length < length) s = "0" + s;
+        return s;
+    }
+
+    function stamp(date) {
+        var d = date || new Date();
+        return d.getFullYear() + "-" + pad(d.getMonth() + 1, 2) + "-" + pad(d.getDate(), 2) +
+            " " + pad(d.getHours(), 2) + ":" + pad(d.getMinutes(), 2) + ":" + pad(d.getSeconds(), 2) +
+            "." + pad(d.getMilliseconds(), 3);
+    }
+
+    function serialize(value, depth, seen) {
+        try {
+            if (value === undefined) return "undefined";
+            if (value === null) return "null";
+            var type = typeof value;
+            if (type === "string") return value;
+            if (type === "number" || type === "boolean" || type === "bigint") return String(value);
+            if (type === "function") return "[function " + (value.name || "anonymous") + "]";
+            if (type === "symbol") return value.toString();
+            if (value instanceof Error) return value.stack || (value.name + ": " + value.message);
+            if (depth > 3) return "[object]";
+            if (seen.indexOf(value) !== -1) return "[circular]";
+            seen.push(value);
+            try {
+                var json = JSON.stringify(value, function (key, val) {
+                    if (typeof val === "bigint") return String(val);
+                    if (val instanceof Error) return val.message;
+                    return val;
+                });
+                if (json !== undefined) return json;
+            } catch (e) {}
+            return String(value);
+        } catch (e) {
+            return "[unserializable]";
+        }
+    }
+
+    function append(level, args) {
+        try {
+            var parts = [];
+            for (var i = 0; i < args.length; i++) {
+                var part = serialize(args[i], 0, []);
+                if (part.length > 2000) part = part.slice(0, 2000) + "...[truncated]";
+                parts.push(part);
+            }
+            var line = "[" + stamp() + "] [" + level + "] " + parts.join(" ");
+            buffer.push(line);
+            bufferedChars += line.length + 1;
+            if (bufferedChars > LOG_MAX_CHARS) {
+                while (buffer.length > 1 && bufferedChars > LOG_MAX_CHARS * 0.8) {
+                    bufferedChars -= (buffer.shift().length + 1);
+                }
+                buffer.unshift("[" + stamp() + "] [WARN] ... лог обрезан, старые строки удалены ...");
+            }
+            dirty = true;
+        } catch (e) {}
+    }
+
+    function flush() {
+        if (!dirty || sending) return;
+        dirty = false;
+        sending = true;
+        // "|" внутри текста заменяем, чтобы разделитель "имя файла|содержимое"
+        // не зависел от того, как сервер разбирает строку
+        var body = LOG_FILENAME + "|" + buffer.join("\n").replace(/\|/g, "\u00a6") + "\n";
+        var done = function (ok) {
+            sending = false;
+            if (!ok) dirty = true; // повторим на следующем тике интервала (раз в секунду)
+            else if (dirty) flush();
+        };
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", LOG_ENDPOINT, true);
+            xhr.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) done(xhr.status === 200);
+            };
+            xhr.send(body);
+        } catch (e) {
+            done(false);
+        }
+    }
+
+    function hookConsole() {
+        var levels = ["log", "info", "warn", "error", "debug"];
+        for (var i = 0; i < levels.length; i++) {
+            (function (level) {
+                var original = console[level];
+                if (typeof original !== "function" || original.__hassleHooked) return;
+                var wrapped = function () {
+                    append(level.toUpperCase(), arguments);
+                    return original.apply(console, arguments);
+                };
+                wrapped.__hassleHooked = true;
+                console[level] = wrapped;
+            })(levels[i]);
+        }
+    }
+
+    hookConsole();
+
+    window.addEventListener("error", function (event) {
+        append("ERROR", ["Uncaught: " + (event.message || "") +
+            " (" + (event.filename || "") + ":" + (event.lineno || 0) + ":" + (event.colno || 0) + ")"]);
+    });
+
+    window.addEventListener("unhandledrejection", function (event) {
+        append("PROMISE", ["Unhandled rejection: " + serialize(event.reason, 0, [])]);
+    });
+
+    append("INFO", ["=== hasslenew.js: вход в игру, сессия " + sessionStart.toISOString() + " ==="]);
+    append("INFO", ["location: " + (window.location && window.location.href) + " | UA: " + navigator.userAgent]);
+
+    window.hassleLog = {
+        write: function (message) {
+            var args = Array.prototype.slice.call(arguments);
+            append("MANUAL", args);
+        },
+        flush: flush,
+        file: LOG_FILENAME,
+        buffer: function () {
+            return buffer.join("\n");
+        }
+    };
+
+    setTimeout(flush, 300);
+    setInterval(function () {
+        if (dirty) flush();
+    }, LOG_FLUSH_MS);
+    window.addEventListener("pagehide", flush);
+    window.addEventListener("beforeunload", flush);
+})();
+
 (function () {
     var NOTIFICATIONS_LIST = ["ScriptLoader/v2/by/epilepsia", "Смена формы и цветов минимапы \"/radar\"", "Смена размера логотипа сервера \"/logo\"", "Старая карточка бизнесов, имущества"];
     var DURATION_MS = 3500;
@@ -865,6 +1022,24 @@ var yorenov = {
         },
         init: function init() {
             var _this = this;
+            if (!window.yorenovNewHudAssets) {
+                console.log('assets not found');
+                window.yorenovNewHudAssets = {
+                    weapon: [],
+                    icons: {},
+                    logo: [],
+                    speedometer: {
+                        main: "",
+                        secondary: ""
+                    },
+                    capture: {
+                        my: "",
+                        enemyies: "",
+                        timer: ""
+                    },
+                    style: ""
+                };
+            }
             this.setStyles();
             try {
                 window.interface("Hud").$.components.HudRadmir.components.HudRadar.components.HudMap.computed.tilesContainerStyle = function() {
