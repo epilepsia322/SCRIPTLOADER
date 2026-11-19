@@ -865,24 +865,6 @@ var yorenov = {
         },
         init: function init() {
             var _this = this;
-            if (!window.yorenovNewHudAssets) {
-                console.log('assets not found');
-                window.yorenovNewHudAssets = {
-                    weapon: [],
-                    icons: {},
-                    logo: [],
-                    speedometer: {
-                        main: "",
-                        secondary: ""
-                    },
-                    capture: {
-                        my: "",
-                        enemyies: "",
-                        timer: ""
-                    },
-                    style: ""
-                };
-            }
             this.setStyles();
             try {
                 window.interface("Hud").$.components.HudRadmir.components.HudRadar.components.HudMap.computed.tilesContainerStyle = function() {
