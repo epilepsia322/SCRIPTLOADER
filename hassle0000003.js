@@ -753,7 +753,12 @@ var yorenov = {
             if (e === "isShowFreeze" && a) this.data.freeze.wrapper.style.display = "";
             if (e === "isShowFreeze" && !a) this.data.freeze.wrapper.style.display = "none";
             if (e == "freeze") this.data.freeze.value.style.width = a + "%";
-            if (e == "show" || e == "showBars") this.data.infoShown = +a >= 1;
+            if (e == "show" || e == "showBars") {
+                this.data.infoShown = +a >= 1;
+                try {
+                    yorenov.hudRehook.trace("info." + e + " = " + a + " (игра " + (+a >= 1 ? "показывает" : "скрывает") + " худ)");
+                } catch (error) {}
+            }
             if ((e == "show" || e == "showBars") && +a >= 1) {
                 this.data.hudEl.style.display = "";
                 setTimeout(function() {
@@ -934,7 +939,9 @@ var yorenov = {
         data: {
             timer: null,
             lastHud: null,
-            wasMounted: null
+            wasMounted: null,
+            traceEl: null,
+            badgeEl: null
         },
         MARKER: "__epYorenovHooked",
         isHooked: function isHooked(obj) {
@@ -947,12 +954,64 @@ var yorenov = {
         getMountedHud: function getMountedHud() {
             try {
                 var ci = window.getInterface && window.getInterface("Hud");
-                if (!ci || !ci.$el) return null;
-                if (!document.contains(ci.$el)) return null;
+                if (!ci) return null;
+                if (ci.$el && !document.contains(ci.$el)) return null;
                 return ci;
             } catch (error) {
                 return null;
             }
+        },
+        ensureUi: function ensureUi() {
+            try {
+                var st = yorenov.hudRehook.data;
+                var parent = document.body || document.documentElement;
+                if (!parent) return;
+                if (!st.badgeEl || !st.badgeEl.parentNode) {
+                    var b = document.createElement("div");
+                    b.id = "ep-rehook-badge";
+                    b.textContent = "rehook2";
+                    b.style.cssText = "position:fixed !important;left:1vh !important;bottom:1vh !important;z-index:2147483000 !important;pointer-events:none !important;background:rgba(20,60,20,0.72) !important;color:#d6ffe0 !important;font-size:1.3vh !important;font-family:Arial,Consolas,monospace !important;padding:0.4vh 1vh !important;border-radius:0.3vh !important;";
+                    parent.appendChild(b);
+                    st.badgeEl = b;
+                }
+                if (!st.traceEl || !st.traceEl.parentNode) {
+                    var t = document.createElement("div");
+                    t.id = "ep-rehook-trace";
+                    t.style.cssText = "position:fixed !important;left:1vh !important;bottom:3.6vh !important;z-index:2147483000 !important;pointer-events:none !important;max-width:64vh !important;";
+                    parent.appendChild(t);
+                    st.traceEl = t;
+                }
+            } catch (error) {}
+        },
+        trace: function trace(msg) {
+            try {
+                var d2 = new Date();
+                var ts = (d2.getHours() < 10 ? "0" : "") + d2.getHours() + ":" + (d2.getMinutes() < 10 ? "0" : "") + d2.getMinutes() + ":" + (d2.getSeconds() < 10 ? "0" : "") + d2.getSeconds();
+                try { console.log("[rehook] " + msg); } catch (e) {}
+                yorenov.hudRehook.ensureUi();
+                var t = yorenov.hudRehook.data.traceEl;
+                if (!t) return;
+                var d = document.createElement("div");
+                d.textContent = "[" + ts + "] " + msg;
+                d.style.cssText = "background:rgba(0,0,0,0.62) !important;color:#9fd8ff !important;font-size:1.25vh !important;font-family:Arial !important;padding:0.2vh 0.8vh !important;border-radius:0.3vh !important;margin-bottom:0.3vh !important;";
+                t.appendChild(d);
+                while (t.childNodes.length > 9) t.removeChild(t.firstChild);
+                setTimeout(function() {
+                    try { if (d.parentNode) d.parentNode.removeChild(d); } catch (e) {}
+                }, 9000);
+            } catch (error) {}
+        },
+        setBadge: function setBadge(mounted, ci) {
+            try {
+                var b = yorenov.hudRehook.data.badgeEl;
+                if (!b) return;
+                var hooked = false;
+                if (ci) hooked = yorenov.hudRehook.isHooked(ci.info) && (!ci.speedometer || yorenov.hudRehook.isHooked(ci.speedometer));
+                var shown = "?";
+                try { shown = yorenov.hud.data.hudEl && yorenov.hud.data.hudEl.style.display === "none" ? "скрыт" : "виден"; } catch (e) {}
+                b.textContent = "rehook2 · Hud:" + (mounted ? "вDOM" : "НЕТ") + " · хуки:" + (hooked ? "OK" : "МЕРТВЫ") + " · худ:" + shown;
+                b.style.background = (mounted && hooked) ? "rgba(20,60,20,0.72)" : "rgba(80,20,20,0.72)";
+            } catch (error) {}
         },
         wrapInfo: function wrapInfo(ci) {
             try {
@@ -1097,17 +1156,46 @@ var yorenov = {
         },
         reattachAll: function reattachAll(ci) {
             var data = yorenov.addNewInterfaces.data;
-            if (!data.isNewHudAdded || !yorenov.hud.data.hudEl) return;
+            if (!data.isNewHudAdded || !yorenov.hud.data.hudEl) {
+                yorenov.hudRehook.trace("reattachAll пропущен (худ мода ещё не собран)");
+                return;
+            }
+            yorenov.hudRehook.trace("восстанавливаю хуки Hud...");
             var did = false;
             if (!yorenov.hudRehook.isHooked(ci.info)) {
-                if (yorenov.hudRehook.wrapInfo(ci)) did = true;
+                if (yorenov.hudRehook.wrapInfo(ci)) {
+                    did = true;
+                    yorenov.hudRehook.trace("wrapInfo: OK");
+                } else {
+                    yorenov.hudRehook.trace("wrapInfo: FAIL");
+                }
             }
             if (!yorenov.hudRehook.isHooked(ci.speedometer)) {
-                if (yorenov.hudRehook.wrapSpeedometer(ci)) did = true;
+                if (yorenov.hudRehook.wrapSpeedometer(ci)) {
+                    did = true;
+                    yorenov.hudRehook.trace("wrapSpeedometer: OK");
+                } else {
+                    yorenov.hudRehook.trace("wrapSpeedometer: FAIL (нет колбэка или ошибка)");
+                }
             }
-            yorenov.hudRehook.readdMethods(ci);
-            yorenov.hudRehook.reapplyVisual(ci);
-            yorenov.hudRehook.syncState(ci);
+            try {
+                yorenov.hudRehook.readdMethods(ci);
+                yorenov.hudRehook.trace("методы Hud: OK");
+            } catch (error) {
+                yorenov.hudRehook.trace("методы Hud: FAIL " + error);
+            }
+            try {
+                yorenov.hudRehook.reapplyVisual(ci);
+                yorenov.hudRehook.trace("радар + tiles-патч: OK");
+            } catch (error) {
+                yorenov.hudRehook.trace("радар: FAIL " + error);
+            }
+            try {
+                yorenov.hudRehook.syncState(ci);
+                yorenov.hudRehook.trace("синхронизация значений: OK");
+            } catch (error) {
+                yorenov.hudRehook.trace("syncState: FAIL " + error);
+            }
             if (did) {
                 try {
                     yorenov.logError("(info) hudRehook: хуки восстановлены после пересоздания Hud");
@@ -1119,6 +1207,7 @@ var yorenov = {
             var ci = yorenov.hudRehook.getMountedHud();
             var mounted = !!ci;
             if (!mounted && yorenov.hudRehook.data.wasMounted) {
+                yorenov.hudRehook.trace("Hud РАЗМОНТИРОВАН из DOM (игра убрала худ)");
                 try {
                     if (yorenov.hud.data.infoShown) {
                         yorenov.hud.data.hudEl.style.display = "none";
@@ -1128,16 +1217,36 @@ var yorenov = {
             }
             if (mounted && ci !== yorenov.hudRehook.data.lastHud) {
                 yorenov.hudRehook.data.lastHud = ci;
+                yorenov.hudRehook.trace("Hud ПЕРЕСОЗДАН (новый экземпляр)");
                 yorenov.hudRehook.reattachAll(ci);
             } else if (mounted) {
-                if (!yorenov.hudRehook.isHooked(ci.info) || !yorenov.hudRehook.isHooked(ci.speedometer)) {
+                if (!yorenov.hudRehook.isHooked(ci.info) || (ci.speedometer && !yorenov.hudRehook.isHooked(ci.speedometer))) {
+                    yorenov.hudRehook.trace("хуки потеряны без пересоздания");
                     yorenov.hudRehook.reattachAll(ci);
                 }
             }
             yorenov.hudRehook.data.wasMounted = mounted;
+            yorenov.hudRehook.setBadge(mounted, ci);
         },
         start: function start() {
             if (yorenov.hudRehook.data.timer) return;
+            yorenov.hudRehook.ensureUi();
+            yorenov.hudRehook.trace("rehook2 активен, сторож 250мс");
+            var names = ["openInterface", "closeInterface", "showInterface", "hideInterface"];
+            for (var i = 0; i < names.length; i++) {
+                (function(name) {
+                    var orig = window[name];
+                    if (typeof orig !== "function" || orig.__epRhWrapped) return;
+                    var f = function() {
+                        try {
+                            yorenov.hudRehook.trace(name + "(" + Array.prototype.slice.call(arguments).join(", ") + ")");
+                        } catch (e) {}
+                        return orig.apply(this, arguments);
+                    };
+                    f.__epRhWrapped = true;
+                    try { window[name] = f; } catch (e) {}
+                })(names[i]);
+            }
             yorenov.hudRehook.data.timer = setInterval(function() {
                 try {
                     yorenov.hudRehook.poll();
