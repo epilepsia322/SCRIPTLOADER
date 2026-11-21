@@ -953,7 +953,11 @@ var yorenov = {
             assignOk: null,
             lastMsg: "",
             lastMsgTs: 0,
-            dupCount: 0
+            dupCount: 0,
+            unmountedSince: 0,
+            everMounted: false,
+            lastShowInterfaceCall: 0,
+            hiddenSince: 0
         },
         MARKER: "__epYorenovHooked",
         isHooked: function isHooked(obj) {
@@ -982,7 +986,7 @@ var yorenov = {
                     var b = document.createElement("div");
                     b.id = "ep-rehook-badge";
                     b.textContent = "rehook2";
-                    b.style.cssText = "position:fixed !important;left:1vh !important;bottom:1vh !important;z-index:2147483000 !important;pointer-events:none !important;background:rgba(20,60,20,0.72) !important;color:#d6ffe0 !important;font-size:1.3vh !important;font-family:Arial,Consolas,monospace !important;padding:0.4vh 1vh !important;border-radius:0.3vh !important;";
+                    b.style.cssText = "position:fixed !important;left:1vh !important;bottom:1vh !important;z-index:2147483000 !important;pointer-events:none !important;background:rgba(20,60,20,0.72) !important;color:#d6ffe0 !important;font-size:1.6vh !important;font-family:Arial,Consolas,monospace !important;padding:0.5vh 1.2vh !important;border-radius:0.3vh !important;";
                     parent.appendChild(b);
                     st.badgeEl = b;
                 }
@@ -1364,6 +1368,7 @@ var yorenov = {
                 st.lastHud = ci;
                 st.snapInfo = null;
                 st.snapSpeed = null;
+                st.unmountedSince = 0;
                 yorenov.hudRehook.trace("Hud ПЕРЕСОЗДАН (новый экземпляр)");
                 yorenov.hudRehook.reattachAll(ci);
             } else if (mounted) {
@@ -1371,6 +1376,45 @@ var yorenov = {
                 if (lost && Date.now() - st.lastReattachTs > 2500) {
                     yorenov.hudRehook.trace("хуки потеряны без пересоздания — переприкрепляю (данные всё равно текут через опрос)");
                     yorenov.hudRehook.reattachAll(ci);
+                }
+            }
+            // --- авто-возврат Hud: игра забыла показать Hud после меню ---
+            var now2 = Date.now();
+            if (mounted) {
+                st.everMounted = true;
+                st.unmountedSince = 0;
+            } else if (st.everMounted) {
+                if (!st.unmountedSince) st.unmountedSince = now2;
+                if (now2 - st.unmountedSince > 5000 && now2 - st.lastShowInterfaceCall > 10000) {
+                    st.lastShowInterfaceCall = now2;
+                    try {
+                        if (typeof window.showInterface === "function") {
+                            window.showInterface("Hud");
+                            yorenov.hudRehook.trace("Hud не вернулся в DOM — вызвал showInterface('Hud') сам");
+                        }
+                    } catch (error) {}
+                }
+            }
+            // --- страховка: игра просит показать худ, а мод скрыт >1с ---
+            if (mounted && yorenov.hud.data.hudEl) {
+                var gameShow = false;
+                try { gameShow = ci && ci.info && +ci.info.show >= 1; } catch (e) {}
+                var modHidden = false;
+                try { modHidden = yorenov.hud.data.hudEl.style.display === "none"; } catch (e) {}
+                if (gameShow && modHidden) {
+                    if (!st.hiddenSince) st.hiddenSince = now2;
+                    if (now2 - st.hiddenSince > 1000) {
+                        try {
+                            yorenov.hud.data.hudEl.style.display = "";
+                            var fz = null;
+                            try { fz = ci && ci.info && ci.info.isShowFreeze; } catch (e) {}
+                            yorenov.hud.data.freeze.wrapper.style.display = fz ? "" : "none";
+                        } catch (error) {}
+                        st.hiddenSince = 0;
+                        yorenov.hudRehook.trace("худ: игра просит показать — восстановил видимость");
+                    }
+                } else {
+                    st.hiddenSince = 0;
                 }
             }
             st.wasMounted = mounted;
