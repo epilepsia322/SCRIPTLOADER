@@ -556,6 +556,10 @@ var yorenov = {
             if (yorenov.addNewInterfaces.data.callBacks.length === 0) {
                 var hudInfo = JSON.parse(JSON.stringify(window.interface("Hud").info));
                 window.interface("Hud").info = new Proxy(hudInfo, {
+                    get: function get(target, property) {
+                        if (property === "__epYorenovHooked") return true;
+                        return Reflect.get(target, property);
+                    },
                     set: function set(target, property, value) {
                         try {
                             yorenov.addNewInterfaces.data.callBacks.forEach(function(cb) {
@@ -584,6 +588,7 @@ var yorenov = {
             }
         },
         addNewHud: function addNewHud(htmlContent, className, callBack) {
+            yorenov.addNewInterfaces.data.hudCallBack = callBack;
             if (yorenov.addNewInterfaces.data.isNewHudAdded) return;
             if (!yorenov.addNewInterfaces.data.hudContainer) yorenov.addNewInterfaces.init();
             yorenov.createStyles("body #app .hud-radmir-info {display: none}");
@@ -624,6 +629,7 @@ var yorenov = {
             return hudElement;
         },
         addNewSpeedometer: function addNewSpeedometer(htmlContent, className, callBack) {
+            yorenov.addNewInterfaces.data.speedometerCallBack = callBack;
             if (yorenov.addNewInterfaces.data.isNewSpeedometerAdded) return;
             yorenov.createStyles("body #app .hud-radmir-speedometer {display: none}");
             var speedometerElement = document.createElement("div");
@@ -708,7 +714,8 @@ var yorenov = {
             },
             radar: null,
             bonusEl: null,
-            greenZoneEl: null
+            greenZoneEl: null,
+            infoShown: false
         },
         createHud: function createHud(e) {
             this.data.hudEl = e.querySelector(".OLD-RADMIR-hud");
@@ -746,6 +753,7 @@ var yorenov = {
             if (e === "isShowFreeze" && a) this.data.freeze.wrapper.style.display = "";
             if (e === "isShowFreeze" && !a) this.data.freeze.wrapper.style.display = "none";
             if (e == "freeze") this.data.freeze.value.style.width = a + "%";
+            if (e == "show" || e == "showBars") this.data.infoShown = +a >= 1;
             if ((e == "show" || e == "showBars") && +a >= 1) {
                 this.data.hudEl.style.display = "";
                 setTimeout(function() {
@@ -920,6 +928,221 @@ var yorenov = {
                 window.sendChatInput("/hudscalefix");
                 window.openInterface('GameText');
             }, 2500, "YORENOV MODS HUD");
+        }
+    },
+    hudRehook: {
+        data: {
+            timer: null,
+            lastHud: null,
+            wasMounted: null
+        },
+        MARKER: "__epYorenovHooked",
+        isHooked: function isHooked(obj) {
+            try {
+                return !!(obj && obj[yorenov.hudRehook.MARKER]);
+            } catch (error) {
+                return true;
+            }
+        },
+        getMountedHud: function getMountedHud() {
+            try {
+                var ci = window.getInterface && window.getInterface("Hud");
+                if (!ci || !ci.$el) return null;
+                if (!document.contains(ci.$el)) return null;
+                return ci;
+            } catch (error) {
+                return null;
+            }
+        },
+        wrapInfo: function wrapInfo(ci) {
+            try {
+                var data = yorenov.addNewInterfaces.data;
+                var proxied = new Proxy(JSON.parse(JSON.stringify(ci.info)), {
+                    get: function get(target, property) {
+                        if (property === yorenov.hudRehook.MARKER) return true;
+                        return Reflect.get(target, property);
+                    },
+                    set: function set(target, property, value) {
+                        try {
+                            data.callBacks.forEach(function(cb) {
+                                return cb(property, value);
+                            });
+                        } catch (error) {
+                            console.error(error);
+                        }
+                        return Reflect.set(target, property, value);
+                    }
+                });
+                ci.info = proxied;
+                return true;
+            } catch (error) {
+                console.error("hudRehook wrapInfo:", error);
+                return false;
+            }
+        },
+        wrapSpeedometer: function wrapSpeedometer(ci) {
+            try {
+                var data = yorenov.addNewInterfaces.data;
+                if (!data.speedometerCallBack) return false;
+                var speedometer = JSON.parse(JSON.stringify(ci.speedometer));
+                ci.speedometer = new Proxy(speedometer, {
+                    get: function get(target, property) {
+                        if (property === yorenov.hudRehook.MARKER) return true;
+                        return Reflect.get(target, property);
+                    },
+                    set: function set(target, property, value) {
+                        data.speedometerCallBack(property, value);
+                        return Reflect.set(target, property, value);
+                    }
+                });
+                var params = JSON.parse(JSON.stringify(ci.speedometer.params));
+                ci.speedometer.params = new Proxy(params, {
+                    get: function get(target, property) {
+                        if (property === yorenov.hudRehook.MARKER) return true;
+                        return Reflect.get(target, property);
+                    },
+                    set: function set(target, property, value) {
+                        data.speedometerCallBack(property, value);
+                        return Reflect.set(target, property, value);
+                    }
+                });
+                return true;
+            } catch (error) {
+                console.error("hudRehook wrapSpeedometer:", error);
+                return false;
+            }
+        },
+        readdMethods: function readdMethods(ci) {
+            try {
+                var data = yorenov.addNewInterfaces.data;
+                if (data.hudCallBack) {
+                    yorenov.addNewInterfaces.addHudMethods({
+                        showGreenZoneTab: function showGreenZoneTab() {
+                            return data.hudCallBack("showGreenZoneTab");
+                        },
+                        hideGreenZoneTab: function hideGreenZoneTab() {
+                            return data.hudCallBack("hideGreenZoneTab");
+                        },
+                        setBonus: function setBonus(value) {
+                            data.hudCallBack("setBonus", value);
+                            window.interface("Hud").bonus = value;
+                        },
+                        setServer: function setServer(value) {
+                            data.hudCallBack("setServer", value);
+                            window.interface("Hud").server = value;
+                        },
+                        setHelloween: function setHelloween(value) {
+                            data.hudCallBack("setHelloween", value);
+                            window.interface("Hud").isHelloween = value;
+                        },
+                        setNewYear: function setNewYear(value) {
+                            data.hudCallBack("setNewYear", value);
+                            window.interface("Hud").isNewYear = value;
+                        }
+                    });
+                }
+                if (data.speedometerCallBack) {
+                    yorenov.addNewInterfaces.addHudMethods({
+                        showTachometer: function showTachometer() {
+                            return data.speedometerCallBack("tachometer-show", 1);
+                        },
+                        hideTachometer: function hideTachometer() {
+                            return data.speedometerCallBack("tachometer-show", 0);
+                        },
+                        setTurnLightStatus: function setTurnLightStatus(direction, status) {
+                            return data.speedometerCallBack(direction ? "right" : "left", status);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("hudRehook readdMethods:", error);
+            }
+        },
+        reapplyVisual: function reapplyVisual(ci) {
+            try {
+                yorenov.yorenovRadar.applyRadar();
+            } catch (error) {}
+            try {
+                var hudMap = ci.$ && ci.$.components && ci.$.components.HudRadmir && ci.$.components.HudRadmir.components &&
+                    ci.$.components.HudRadmir.components.HudRadar && ci.$.components.HudRadmir.components.HudRadar.components &&
+                    ci.$.components.HudRadmir.components.HudRadar.components.HudMap;
+                if (hudMap && hudMap.computed) {
+                    hudMap.computed.tilesContainerStyle = function() {
+                        return _objectSpread({}, yorenov.hud.playerIsInInterior && {
+                            display: "block"
+                        });
+                    };
+                }
+            } catch (error) {}
+        },
+        syncState: function syncState(ci) {
+            try {
+                window.interface("Hud").setBonus(window.interface("Hud").bonus);
+                window.interface("Hud").setServer(window.interface("Hud").server);
+                var info = window.interface("Hud").info;
+                info.health = info.health;
+                info.armour = info.armour;
+                info.hunger = info.hunger;
+                info.breath = info.breath;
+                info.ammoInClip = info.ammoInClip;
+                info.totalAmmo = info.totalAmmo;
+                info.money = info.money;
+                info.weapon = info.weapon;
+                info.isShowFreeze = info.isShowFreeze;
+                info.freeze = info.freeze;
+                info.show = info.show;
+            } catch (error) {
+                console.error("hudRehook syncState:", error);
+            }
+        },
+        reattachAll: function reattachAll(ci) {
+            var data = yorenov.addNewInterfaces.data;
+            if (!data.isNewHudAdded || !yorenov.hud.data.hudEl) return;
+            var did = false;
+            if (!yorenov.hudRehook.isHooked(ci.info)) {
+                if (yorenov.hudRehook.wrapInfo(ci)) did = true;
+            }
+            if (!yorenov.hudRehook.isHooked(ci.speedometer)) {
+                if (yorenov.hudRehook.wrapSpeedometer(ci)) did = true;
+            }
+            yorenov.hudRehook.readdMethods(ci);
+            yorenov.hudRehook.reapplyVisual(ci);
+            yorenov.hudRehook.syncState(ci);
+            if (did) {
+                try {
+                    yorenov.logError("(info) hudRehook: хуки восстановлены после пересоздания Hud");
+                } catch (error) {}
+            }
+        },
+        poll: function poll() {
+            if (!window.getInterface) return;
+            var ci = yorenov.hudRehook.getMountedHud();
+            var mounted = !!ci;
+            if (!mounted && yorenov.hudRehook.data.wasMounted) {
+                try {
+                    if (yorenov.hud.data.infoShown) {
+                        yorenov.hud.data.hudEl.style.display = "none";
+                        yorenov.hud.data.freeze.wrapper.style.display = "none";
+                    }
+                } catch (error) {}
+            }
+            if (mounted && ci !== yorenov.hudRehook.data.lastHud) {
+                yorenov.hudRehook.data.lastHud = ci;
+                yorenov.hudRehook.reattachAll(ci);
+            } else if (mounted) {
+                if (!yorenov.hudRehook.isHooked(ci.info) || !yorenov.hudRehook.isHooked(ci.speedometer)) {
+                    yorenov.hudRehook.reattachAll(ci);
+                }
+            }
+            yorenov.hudRehook.data.wasMounted = mounted;
+        },
+        start: function start() {
+            if (yorenov.hudRehook.data.timer) return;
+            yorenov.hudRehook.data.timer = setInterval(function() {
+                try {
+                    yorenov.hudRehook.poll();
+                } catch (error) {}
+            }, 250);
         }
     },
     yorenovRadar: {
@@ -1466,6 +1689,9 @@ var yorenov = {
     step(function() {
         yorenov.yorenovRadar.init();
         yorenov.yorenovLogo.init();
+    });
+    step(function() {
+        yorenov.hudRehook.start();
     });
     step(function() {
         yorenov.captureMod.init();
