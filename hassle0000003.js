@@ -938,10 +938,22 @@ var yorenov = {
     hudRehook: {
         data: {
             timer: null,
+            speedTimer: null,
             lastHud: null,
             wasMounted: null,
             traceEl: null,
-            badgeEl: null
+            badgeEl: null,
+            snapInfo: null,
+            snapSpeed: null,
+            lastRadarFix: 0,
+            lastReattachTs: 0,
+            rehookCount: 0,
+            pollFired: 0,
+            pollSpeedFired: 0,
+            assignOk: null,
+            lastMsg: "",
+            lastMsgTs: 0,
+            dupCount: 0
         },
         MARKER: "__epYorenovHooked",
         isHooked: function isHooked(obj) {
@@ -985,9 +997,18 @@ var yorenov = {
         },
         trace: function trace(msg) {
             try {
+                try { console.log("[rehook] " + msg); } catch (e) {}
+                var st = yorenov.hudRehook.data;
+                var now = Date.now();
+                if (st.lastMsg === msg && now - st.lastMsgTs < 4000) {
+                    st.dupCount++;
+                    return;
+                }
+                st.lastMsg = msg;
+                st.lastMsgTs = now;
+                st.dupCount = 0;
                 var d2 = new Date();
                 var ts = (d2.getHours() < 10 ? "0" : "") + d2.getHours() + ":" + (d2.getMinutes() < 10 ? "0" : "") + d2.getMinutes() + ":" + (d2.getSeconds() < 10 ? "0" : "") + d2.getSeconds();
-                try { console.log("[rehook] " + msg); } catch (e) {}
                 yorenov.hudRehook.ensureUi();
                 var t = yorenov.hudRehook.data.traceEl;
                 if (!t) return;
@@ -1005,12 +1026,20 @@ var yorenov = {
             try {
                 var b = yorenov.hudRehook.data.badgeEl;
                 if (!b) return;
+                var st = yorenov.hudRehook.data;
                 var hooked = false;
                 if (ci) hooked = yorenov.hudRehook.isHooked(ci.info) && (!ci.speedometer || yorenov.hudRehook.isHooked(ci.speedometer));
                 var shown = "?";
                 try { shown = yorenov.hud.data.hudEl && yorenov.hud.data.hudEl.style.display === "none" ? "скрыт" : "виден"; } catch (e) {}
-                b.textContent = "rehook2 · Hud:" + (mounted ? "вDOM" : "НЕТ") + " · хуки:" + (hooked ? "OK" : "МЕРТВЫ") + " · худ:" + shown;
-                b.style.background = (mounted && hooked) ? "rgba(20,60,20,0.72)" : "rgba(80,20,20,0.72)";
+                var modDom = "нет";
+                try { modDom = (yorenov.addNewInterfaces.data.isNewHudAdded && yorenov.hud.data.hudEl) ? "есть" : "НЕТ"; } catch (e) {}
+                var dataLive = st.pollFired > 0 || hooked;
+                b.textContent = "rehook3 · Hud:" + (mounted ? "вDOM" : "НЕТ") +
+                    " · прокси:" + (st.assignOk === false ? "не прижился" : (hooked ? "OK" : "нет")) +
+                    " · опрос:" + (st.pollFired > 0 ? "жив(F" + st.pollFired + (st.pollSpeedFired ? "/S" + st.pollSpeedFired : "") + ")" : "ждёт") +
+                    " · R" + st.rehookCount +
+                    " · модDOM:" + modDom + " · худ:" + shown;
+                b.style.background = (mounted && dataLive) ? "rgba(20,60,20,0.72)" : "rgba(80,20,20,0.72)";
             } catch (error) {}
         },
         wrapInfo: function wrapInfo(ci) {
@@ -1033,6 +1062,11 @@ var yorenov = {
                     }
                 });
                 ci.info = proxied;
+                var ok = yorenov.hudRehook.isHooked(ci.info);
+                yorenov.hudRehook.data.assignOk = ok;
+                if (!ok) {
+                    try { console.error("[rehook] ПРОКси info НЕ ПРИЖИЛСЯ на этом Hud — работаю через опрос"); } catch (e) {}
+                }
                 return true;
             } catch (error) {
                 console.error("hudRehook wrapInfo:", error);
@@ -1156,8 +1190,10 @@ var yorenov = {
         },
         reattachAll: function reattachAll(ci) {
             var data = yorenov.addNewInterfaces.data;
+            yorenov.hudRehook.data.lastReattachTs = Date.now();
+            yorenov.hudRehook.data.rehookCount++;
             if (!data.isNewHudAdded || !yorenov.hud.data.hudEl) {
-                yorenov.hudRehook.trace("reattachAll пропущен (худ мода ещё не собран)");
+                yorenov.hudRehook.trace("reattachAll пропущен (худ мода ещё не собран) — данные всё равно текут через опрос");
                 return;
             }
             yorenov.hudRehook.trace("восстанавливаю хуки Hud...");
@@ -1165,10 +1201,16 @@ var yorenov = {
             if (!yorenov.hudRehook.isHooked(ci.info)) {
                 if (yorenov.hudRehook.wrapInfo(ci)) {
                     did = true;
-                    yorenov.hudRehook.trace("wrapInfo: OK");
+                    if (yorenov.hudRehook.data.assignOk) {
+                        yorenov.hudRehook.trace("wrapInfo: OK (прокси прижился)");
+                    } else {
+                        yorenov.hudRehook.trace("wrapInfo: присвоен, НЕ прижился — работаю через опрос");
+                    }
                 } else {
-                    yorenov.hudRehook.trace("wrapInfo: FAIL");
+                    yorenov.hudRehook.trace("wrapInfo: FAIL (исключение)");
                 }
+            } else {
+                yorenov.hudRehook.data.assignOk = true;
             }
             if (!yorenov.hudRehook.isHooked(ci.speedometer)) {
                 if (yorenov.hudRehook.wrapSpeedometer(ci)) {
@@ -1202,11 +1244,112 @@ var yorenov = {
                 } catch (error) {}
             }
         },
+        fire: function fire(key, value) {
+            var data = yorenov.addNewInterfaces.data;
+            data.pollFired = (data.pollFired || 0) + 1;
+            yorenov.hudRehook.data.pollFired = data.pollFired;
+            try {
+                data.callBacks.forEach(function(cb) {
+                    try { cb(key, value); } catch (e) {}
+                });
+            } catch (error) {}
+        },
+        fireSpeed: function fireSpeed(path, value) {
+            var data = yorenov.addNewInterfaces.data;
+            if (!data.speedometerCallBack) return;
+            data.pollSpeedFired = (data.pollSpeedFired || 0) + 1;
+            yorenov.hudRehook.data.pollSpeedFired = data.pollSpeedFired;
+            var seg = String(path).split(".").pop();
+            try { data.speedometerCallBack(seg, value); } catch (e) {}
+        },
+        INFO_KEYS: ["health", "armour", "hunger", "breath", "money", "ammoInClip", "totalAmmo", "weapon", "wanted", "show", "showBars", "isShowFreeze", "freeze"],
+        pollInfoDiff: function pollInfoDiff() {
+            var st = yorenov.hudRehook.data;
+            var data = yorenov.addNewInterfaces.data;
+            if (!data.callBacks.length) return;
+            var ci = yorenov.hudRehook.getMountedHud();
+            if (!ci) {
+                st.snapInfo = null;
+                return;
+            }
+            var keys = yorenov.hudRehook.INFO_KEYS;
+            var cur = {};
+            for (var i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                try { cur[k] = ci.info ? ci.info[k] : undefined; } catch (e) { cur[k] = undefined; }
+            }
+            if (st.snapInfo === null) {
+                st.snapInfo = cur;
+                for (var j = 0; j < keys.length; j++) yorenov.hudRehook.fire(keys[j], cur[keys[j]]);
+                return;
+            }
+            for (var n = 0; n < keys.length; n++) {
+                var kk = keys[n];
+                if (cur[kk] !== st.snapInfo[kk]) yorenov.hudRehook.fire(kk, cur[kk]);
+            }
+            st.snapInfo = cur;
+        },
+        flatSnapshot: function flatSnapshot(obj, depth) {
+            var out = {};
+            if (!obj || typeof obj !== "object") return out;
+            for (var k in obj) {
+                var v;
+                try { v = obj[k]; } catch (e) { continue; }
+                if (v && typeof v === "object" && depth > 1) {
+                    var sub = yorenov.hudRehook.flatSnapshot(v, depth - 1);
+                    for (var k2 in sub) out[k + "." + k2] = sub[k2];
+                } else if (typeof v !== "function" && k !== yorenov.hudRehook.MARKER) {
+                    out[k] = v;
+                }
+            }
+            return out;
+        },
+        pollSpeedDiff: function pollSpeedDiff() {
+            var st = yorenov.hudRehook.data;
+            var data = yorenov.addNewInterfaces.data;
+            if (!data.speedometerCallBack) return;
+            var ci = yorenov.hudRehook.getMountedHud();
+            if (!ci || !ci.speedometer) {
+                st.snapSpeed = null;
+                return;
+            }
+            var cur = yorenov.hudRehook.flatSnapshot(ci.speedometer, 2);
+            if (st.snapSpeed === null) {
+                st.snapSpeed = cur;
+                for (var p in cur) yorenov.hudRehook.fireSpeed(p, cur[p]);
+                return;
+            }
+            for (var p2 in cur) {
+                if (cur[p2] !== st.snapSpeed[p2]) yorenov.hudRehook.fireSpeed(p2, cur[p2]);
+            }
+            for (var p3 in st.snapSpeed) {
+                if (!(p3 in cur)) { /* ключ ушёл — пропускаем */ }
+            }
+            st.snapSpeed = cur;
+        },
+        radarGuard: function radarGuard() {
+            var st = yorenov.hudRehook.data;
+            var now = Date.now();
+            if (st.lastRadarFix && now - st.lastRadarFix < 1000) return;
+            var el = null;
+            try { el = document.querySelector(".hud-radmir-radar"); } catch (e) { return; }
+            if (!el) return;
+            var has = false;
+            try { has = /radar-(round|rectangular|square|oval)/.test(String(el.className)); } catch (e) {}
+            if (!has) {
+                st.lastRadarFix = now;
+                try { yorenov.yorenovRadar.applyRadar(); } catch (e) {}
+                yorenov.hudRehook.trace("радар: форму восстановил (класс слетел)");
+            }
+        },
         poll: function poll() {
             if (!window.getInterface) return;
+            var st = yorenov.hudRehook.data;
+            yorenov.hudRehook.pollInfoDiff();
+            yorenov.hudRehook.radarGuard();
             var ci = yorenov.hudRehook.getMountedHud();
             var mounted = !!ci;
-            if (!mounted && yorenov.hudRehook.data.wasMounted) {
+            if (!mounted && st.wasMounted) {
                 yorenov.hudRehook.trace("Hud РАЗМОНТИРОВАН из DOM (игра убрала худ)");
                 try {
                     if (yorenov.hud.data.infoShown) {
@@ -1214,24 +1357,29 @@ var yorenov = {
                         yorenov.hud.data.freeze.wrapper.style.display = "none";
                     }
                 } catch (error) {}
+                st.snapInfo = null;
+                st.snapSpeed = null;
             }
-            if (mounted && ci !== yorenov.hudRehook.data.lastHud) {
-                yorenov.hudRehook.data.lastHud = ci;
+            if (mounted && ci !== st.lastHud) {
+                st.lastHud = ci;
+                st.snapInfo = null;
+                st.snapSpeed = null;
                 yorenov.hudRehook.trace("Hud ПЕРЕСОЗДАН (новый экземпляр)");
                 yorenov.hudRehook.reattachAll(ci);
             } else if (mounted) {
-                if (!yorenov.hudRehook.isHooked(ci.info) || (ci.speedometer && !yorenov.hudRehook.isHooked(ci.speedometer))) {
-                    yorenov.hudRehook.trace("хуки потеряны без пересоздания");
+                var lost = !yorenov.hudRehook.isHooked(ci.info) || (ci.speedometer && !yorenov.hudRehook.isHooked(ci.speedometer));
+                if (lost && Date.now() - st.lastReattachTs > 2500) {
+                    yorenov.hudRehook.trace("хуки потеряны без пересоздания — переприкрепляю (данные всё равно текут через опрос)");
                     yorenov.hudRehook.reattachAll(ci);
                 }
             }
-            yorenov.hudRehook.data.wasMounted = mounted;
+            st.wasMounted = mounted;
             yorenov.hudRehook.setBadge(mounted, ci);
         },
         start: function start() {
             if (yorenov.hudRehook.data.timer) return;
             yorenov.hudRehook.ensureUi();
-            yorenov.hudRehook.trace("rehook2 активен, сторож 250мс");
+            yorenov.hudRehook.trace("rehook3 активен: прокси + опрос (info 250мс, спидометр 80мс)");
             var names = ["openInterface", "closeInterface", "showInterface", "hideInterface"];
             for (var i = 0; i < names.length; i++) {
                 (function(name) {
@@ -1252,6 +1400,11 @@ var yorenov = {
                     yorenov.hudRehook.poll();
                 } catch (error) {}
             }, 250);
+            yorenov.hudRehook.data.speedTimer = setInterval(function() {
+                try {
+                    yorenov.hudRehook.pollSpeedDiff();
+                } catch (error) {}
+            }, 80);
         }
     },
     yorenovRadar: {
